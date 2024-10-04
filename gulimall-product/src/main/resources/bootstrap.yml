@@ -1,0 +1,17 @@
+#springCloud引导配置文件
+spring:
+  application:
+    name: gulimall-product
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.30.60.231:8848
+        namespace: 2c3d3b29-c176-4957-ba09-3d81f6afa63d
+      config:
+        file-extension: yaml
+        shared-configs:
+          - data-id: gulimall-shared-datasource.yaml
+          - data-id: gulimall-shared-mybatis.yaml
+        namespace: 2c3d3b29-c176-4957-ba09-3d81f6afa63d

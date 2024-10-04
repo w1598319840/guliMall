@@ -10,8 +10,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @MapperScan("cn.wjk.gulimall.product.dao")
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "cn.wjk.gulimall.common.feign")
-public class GuliMallProductApplication {
+public class GulimallProductApplication {
     public static void main(String[] args) {
-        SpringApplication.run(GuliMallProductApplication.class, args);
+        SpringApplication.run(GulimallProductApplication.class, args);
     }
 }
