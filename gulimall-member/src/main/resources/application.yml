@@ -7,6 +7,9 @@ spring:
     password: w1246819119
     url: jdbc:mysql://172.30.60.231:3306/gulimall_ums
     driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      server-addr: 172.30.60.231:8848
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   global-config:
