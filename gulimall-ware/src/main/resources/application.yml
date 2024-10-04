@@ -1,0 +1,16 @@
+#springBoot核心配置文件
+spring:
+  application:
+    name: gulimall-ware
+  datasource:
+    username: root
+    password: w1246819119
+    url: jdbc:mysql://172.30.60.231:3306/gulimall_wms
+    driver-class-name: com.mysql.cj.jdbc.Driver
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+server:
+  port: 11000
