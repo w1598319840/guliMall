@@ -1,0 +1,17 @@
+#springBoot核心配置文件
+server:
+  port: 88
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: gulimall-coupon
+#          uri: lb://gulimall-coupon
+#        - id: gulimall-member
+#          uri: lb://gulimall-member
+#        - id: gulimall-order
+#          uri: lb://gulimall-order
+#        - id: gulimall-product
+#          uri: lb://gulimall-product
+#        - id: gulimall-ware
+#          uri: lb://gulimall-ware

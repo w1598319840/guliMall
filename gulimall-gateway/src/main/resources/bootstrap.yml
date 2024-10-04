@@ -1,0 +1,11 @@
+#springCloud引导配置文件
+spring:
+  application:
+    name: gulimall-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.30.60.231:8848
+        namespace: 2c3d3b29-c176-4957-ba09-3d81f6afa63d
+      config:
+        namespace: 2c3d3b29-c176-4957-ba09-3d81f6afa63d
