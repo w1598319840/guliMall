@@ -8,7 +8,6 @@ import cn.wjk.gulimall.product.entity.CategoryEntity;
 import cn.wjk.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -37,7 +36,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public List<CategoryVO> listWithTree() {
-        List<CategoryEntity> categoryEntities = categoryDao.selectList(Wrappers.emptyWrapper());
+        List<CategoryEntity> categoryEntities = lambdaQuery().eq(CategoryEntity::getShowStatus, 1).list();
         List<CategoryVO> categoryVOs = categoryEntities.stream().map(categoryEntity -> {
             CategoryVO categoryVO = new CategoryVO();
             BeanUtils.copyProperties(categoryEntity, categoryVO);
@@ -69,5 +68,17 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return categoryVOs.stream().filter(categoryVO -> categoryVO.getCatLevel().equals(1))
                 .sorted(comparator)
                 .toList();
+    }
+
+    @Override
+    public void removeCategoryByIds(List<Long> ids) {
+        //检查是否被其他category引用
+        List<CategoryEntity> children = lambdaQuery().in(CategoryEntity::getParentCid, ids).list();
+        if (children != null && !children.isEmpty()) {
+            return;
+//            throw new
+        }
+        //使用逻辑删除
+        categoryDao.deleteByIds(ids);
     }
 }
