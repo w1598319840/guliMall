@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.wjk.gulimall.product.dao.SkuSaleAttrValueDao;
-import cn.wjk.gulimall.product.entity.SkuSaleAttrValueEntity;
+import cn.wjk.gulimall.product.domain.entity.SkuSaleAttrValueEntity;
 import cn.wjk.gulimall.product.service.SkuSaleAttrValueService;
 
 

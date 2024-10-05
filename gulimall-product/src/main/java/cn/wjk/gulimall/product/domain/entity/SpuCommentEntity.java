@@ -1,8 +1,9 @@
-package cn.wjk.gulimall.product.entity;
+package cn.wjk.gulimall.product.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -17,6 +18,7 @@ import lombok.Data;
 @Data
 @TableName("pms_spu_comment")
 public class SpuCommentEntity implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**

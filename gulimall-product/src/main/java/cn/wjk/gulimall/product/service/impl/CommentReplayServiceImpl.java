@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.wjk.gulimall.product.dao.CommentReplayDao;
-import cn.wjk.gulimall.product.entity.CommentReplayEntity;
+import cn.wjk.gulimall.product.domain.entity.CommentReplayEntity;
 import cn.wjk.gulimall.product.service.CommentReplayService;
 
 

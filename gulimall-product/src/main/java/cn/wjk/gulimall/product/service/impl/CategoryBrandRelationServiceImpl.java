@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.wjk.gulimall.product.dao.CategoryBrandRelationDao;
-import cn.wjk.gulimall.product.entity.CategoryBrandRelationEntity;
+import cn.wjk.gulimall.product.domain.entity.CategoryBrandRelationEntity;
 import cn.wjk.gulimall.product.service.CategoryBrandRelationService;
 
 

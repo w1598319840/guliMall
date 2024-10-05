@@ -1,6 +1,6 @@
 package cn.wjk.gulimall.product.dao;
 
-import cn.wjk.gulimall.product.entity.AttrAttrgroupRelationEntity;
+import cn.wjk.gulimall.product.domain.entity.AttrAttrgroupRelationEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

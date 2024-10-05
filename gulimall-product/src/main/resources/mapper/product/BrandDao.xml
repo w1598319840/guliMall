@@ -4,7 +4,7 @@
 <mapper namespace="cn.wjk.gulimall.product.dao.BrandDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="cn.wjk.gulimall.product.entity.BrandEntity" id="brandMap">
+    <resultMap type="cn.wjk.gulimall.product.domain.entity.BrandEntity" id="brandMap">
         <result property="brandId" column="brand_id"/>
         <result property="name" column="name"/>
         <result property="logo" column="logo"/>

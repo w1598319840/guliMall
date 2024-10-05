@@ -2,7 +2,7 @@ package cn.wjk.gulimall.product.controller;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
-import cn.wjk.gulimall.product.entity.AttrEntity;
+import cn.wjk.gulimall.product.domain.entity.AttrEntity;
 import cn.wjk.gulimall.product.service.AttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

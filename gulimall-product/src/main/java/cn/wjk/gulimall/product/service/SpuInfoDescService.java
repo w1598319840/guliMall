@@ -2,7 +2,7 @@ package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
 import com.baomidou.mybatisplus.extension.service.IService;
-import cn.wjk.gulimall.product.entity.SpuInfoDescEntity;
+import cn.wjk.gulimall.product.domain.entity.SpuInfoDescEntity;
 
 import java.util.Map;
 

@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.wjk.gulimall.product.dao.SpuCommentDao;
-import cn.wjk.gulimall.product.entity.SpuCommentEntity;
+import cn.wjk.gulimall.product.domain.entity.SpuCommentEntity;
 import cn.wjk.gulimall.product.service.SpuCommentService;
 
 

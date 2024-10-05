@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.wjk.gulimall.product.entity.SpuInfoDescEntity;
+import cn.wjk.gulimall.product.domain.entity.SpuInfoDescEntity;
 import cn.wjk.gulimall.product.service.SpuInfoDescService;
 
 

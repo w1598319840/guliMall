@@ -2,9 +2,10 @@ package cn.wjk.gulimall.product.controller;
 
 import cn.wjk.gulimall.common.entity.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.R;
-import cn.wjk.gulimall.product.entity.CategoryEntity;
+import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import cn.wjk.gulimall.product.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -41,16 +42,17 @@ public class CategoryController {
     @RequestMapping("/info/{catId}")
     public R info(@PathVariable("catId") Long catId) {
         CategoryEntity category = categoryService.getById(catId);
-
-        return R.ok().put("category", category);
+        return R.ok().put("data", category);
     }
 
     /**
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody CategoryEntity category) {
-        categoryService.save(category);
+    public R save(@RequestBody CategoryVO categoryVO) {
+        CategoryEntity categoryEntity = new CategoryEntity();
+        BeanUtils.copyProperties(categoryVO, categoryEntity);
+        categoryService.save(categoryEntity);
 
         return R.ok();
     }

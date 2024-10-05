@@ -1,4 +1,4 @@
-package cn.wjk.gulimall.product.entity;
+package cn.wjk.gulimall.product.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -8,15 +8,15 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 商品评价回复关系
+ * sku图片
  *
  * @author wenjiakai
  * @email 1598319840@qq.com
  * @date 2024-10-03 20:19:51
  */
 @Data
-@TableName("pms_comment_replay")
-public class CommentReplayEntity implements Serializable {
+@TableName("pms_sku_images")
+public class SkuImagesEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -26,12 +26,20 @@ public class CommentReplayEntity implements Serializable {
     @TableId
     private Long id;
     /**
-     * 评论id
+     * sku_id
      */
-    private Long commentId;
+    private Long skuId;
     /**
-     * 回复id
+     * 图片地址
      */
-    private Long replyId;
+    private String imgUrl;
+    /**
+     * 排序
+     */
+    private Integer imgSort;
+    /**
+     * 默认图[0 - 不是默认图，1 - 是默认图]
+     */
+    private Integer defaultImg;
 
 }

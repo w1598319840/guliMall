@@ -4,7 +4,7 @@ import cn.wjk.gulimall.common.entity.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 import cn.wjk.gulimall.product.dao.CategoryDao;
-import cn.wjk.gulimall.product.entity.CategoryEntity;
+import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import cn.wjk.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -36,7 +36,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public List<CategoryVO> listWithTree() {
-        List<CategoryEntity> categoryEntities = lambdaQuery().eq(CategoryEntity::getShowStatus, 1).list();
+        List<CategoryEntity> categoryEntities = lambdaQuery().list();
         List<CategoryVO> categoryVOs = categoryEntities.stream().map(categoryEntity -> {
             CategoryVO categoryVO = new CategoryVO();
             BeanUtils.copyProperties(categoryEntity, categoryVO);

@@ -2,7 +2,7 @@ package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.entity.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.PageUtils;
-import cn.wjk.gulimall.product.entity.CategoryEntity;
+import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

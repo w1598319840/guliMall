@@ -1,42 +1,40 @@
-package cn.wjk.gulimall.product.entity;
+package cn.wjk.gulimall.product.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
 /**
- * sku信息
+ * spu信息
  * 
  * @author wenjiakai
  * @email 1598319840@qq.com
  * @date 2024-10-03 20:19:51
  */
 @Data
-@TableName("pms_sku_info")
-public class SkuInfoEntity implements Serializable {
+@TableName("pms_spu_info")
+public class SpuInfoEntity implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * skuId
+	 * 商品id
 	 */
 	@TableId
-	private Long skuId;
+	private Long id;
 	/**
-	 * spuId
+	 * 商品名称
 	 */
-	private Long spuId;
+	private String spuName;
 	/**
-	 * sku名称
+	 * 商品描述
 	 */
-	private String skuName;
-	/**
-	 * sku介绍描述
-	 */
-	private String skuDesc;
+	private String spuDescription;
 	/**
 	 * 所属分类id
 	 */
@@ -46,24 +44,20 @@ public class SkuInfoEntity implements Serializable {
 	 */
 	private Long brandId;
 	/**
-	 * 默认图片
+	 * 
 	 */
-	private String skuDefaultImg;
+	private BigDecimal weight;
 	/**
-	 * 标题
+	 * 上架状态[0 - 下架，1 - 上架]
 	 */
-	private String skuTitle;
+	private Integer publishStatus;
 	/**
-	 * 副标题
+	 * 
 	 */
-	private String skuSubtitle;
+	private Date createTime;
 	/**
-	 * 价格
+	 * 
 	 */
-	private BigDecimal price;
-	/**
-	 * 销量
-	 */
-	private Long saleCount;
+	private Date updateTime;
 
 }

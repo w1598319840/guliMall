@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.wjk.gulimall.product.dao.AttrDao;
-import cn.wjk.gulimall.product.entity.AttrEntity;
+import cn.wjk.gulimall.product.domain.entity.AttrEntity;
 import cn.wjk.gulimall.product.service.AttrService;
 
 

@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.wjk.gulimall.product.dao.SkuImagesDao;
-import cn.wjk.gulimall.product.entity.SkuImagesEntity;
+import cn.wjk.gulimall.product.domain.entity.SkuImagesEntity;
 import cn.wjk.gulimall.product.service.SkuImagesService;
 
 
