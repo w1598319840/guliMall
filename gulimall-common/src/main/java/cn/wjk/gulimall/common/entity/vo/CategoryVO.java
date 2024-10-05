@@ -1,29 +1,22 @@
-package cn.wjk.gulimall.product.entity;
+package cn.wjk.gulimall.common.entity.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.util.List;
 
 /**
- * 商品三级分类
- *
- * @author wenjiakai
- * @email 1598319840@qq.com
- * @date 2024-10-03 20:19:51
+ * @Package: cn.wjk.gulimall.common.entity.vo
+ * @ClassName: CategoryVO
+ * @Version: 1.0
+ * @Author: 温嘉凯
+ * @Datetime: 2024/10/4 下午8:28
+ * @Description: 分类的VO
  */
 @Data
-@TableName("pms_category")
-public class CategoryEntity implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class CategoryVO {
     /**
      * 分类id
      */
-    @TableId
     private Long catId;
     /**
      * 分类名称
@@ -57,5 +50,9 @@ public class CategoryEntity implements Serializable {
      * 商品数量
      */
     private Integer productCount;
+    /**
+     * 子分类
+     */
+    private List<CategoryVO> children;
 
 }

@@ -1,20 +1,29 @@
 package cn.wjk.gulimall.product.service.impl;
 
+import cn.wjk.gulimall.common.entity.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
-import org.springframework.stereotype.Service;
-import java.util.Map;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
 import cn.wjk.gulimall.product.dao.CategoryDao;
 import cn.wjk.gulimall.product.entity.CategoryEntity;
 import cn.wjk.gulimall.product.service.CategoryService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service("categoryService")
+@RequiredArgsConstructor
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+    private final CategoryDao categoryDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -26,4 +35,39 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return new PageUtils(page);
     }
 
+    @Override
+    public List<CategoryVO> listWithTree() {
+        List<CategoryEntity> categoryEntities = categoryDao.selectList(Wrappers.emptyWrapper());
+        List<CategoryVO> categoryVOs = categoryEntities.stream().map(categoryEntity -> {
+            CategoryVO categoryVO = new CategoryVO();
+            BeanUtils.copyProperties(categoryEntity, categoryVO);
+            return categoryVO;
+        }).toList();
+
+        //将所有的分类组装成树形结构返回
+        //key: level value: 对应的分类
+        Comparator<CategoryVO> comparator = (c1, c2) -> {
+            Integer s1 = c1.getSort();
+            Integer s2 = c2.getSort();
+            return (s1 == null ? 0 : s1) - (s2 == null ? 0 : s2);
+        };
+        //根据parentId分组
+        Map<Long, List<CategoryVO>> parentIdMap
+                = categoryVOs.stream()
+                .sorted(comparator)
+                .collect(Collectors.groupingBy(CategoryVO::getParentCid));
+        //遍历每一个category，然后将与该categoryId相匹配的parentId的list加入到当前category的children中
+        for (CategoryVO categoryVO : categoryVOs) {
+            List<CategoryVO> children = parentIdMap.get(categoryVO.getCatId());
+            if (children == null) {
+                continue;
+            }
+            categoryVO.setChildren(children.stream()
+                    .sorted(comparator)
+                    .toList());
+        }
+        return categoryVOs.stream().filter(categoryVO -> categoryVO.getCatLevel().equals(1))
+                .sorted(comparator)
+                .toList();
+    }
 }

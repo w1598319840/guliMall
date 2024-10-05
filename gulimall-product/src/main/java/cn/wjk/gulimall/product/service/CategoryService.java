@@ -1,9 +1,11 @@
 package cn.wjk.gulimall.product.service;
 
+import cn.wjk.gulimall.common.entity.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.product.entity.CategoryEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,7 @@ import java.util.Map;
 public interface CategoryService extends IService<CategoryEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    List<CategoryVO> listWithTree();
 }
 

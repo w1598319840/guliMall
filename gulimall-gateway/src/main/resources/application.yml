@@ -1,17 +1,27 @@
 #springBoot核心配置文件
 server:
   port: 88
-#spring:
-#  cloud:
-#    gateway:
-#      routes:
+spring:
+  cloud:
+    gateway:
+      routes:
 #        - id: gulimall-coupon
 #          uri: lb://gulimall-coupon
 #        - id: gulimall-member
 #          uri: lb://gulimall-member
 #        - id: gulimall-order
 #          uri: lb://gulimall-order
-#        - id: gulimall-product
-#          uri: lb://gulimall-product
+        - id: gulimall-product
+          uri: lb://gulimall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=1 #去掉一级路径
 #        - id: gulimall-ware
 #          uri: lb://gulimall-ware
+        - id: renren-fast
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*),/renren-fast/$\{segment}
