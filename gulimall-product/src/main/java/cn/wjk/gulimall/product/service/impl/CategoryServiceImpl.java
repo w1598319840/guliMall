@@ -72,12 +72,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public void removeCategoryByIds(List<Long> ids) {
-        //检查是否被其他category引用
-        List<CategoryEntity> children = lambdaQuery().in(CategoryEntity::getParentCid, ids).list();
-        if (children != null && !children.isEmpty()) {
-            return;
-//            throw new
-        }
         //使用逻辑删除
         categoryDao.deleteByIds(ids);
     }
