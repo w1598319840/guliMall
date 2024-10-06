@@ -1,6 +1,7 @@
 package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
 
@@ -16,5 +17,7 @@ import java.util.Map;
 public interface AttrGroupService extends IService<AttrGroupEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils listByCatelogId(Long catelogId, PageDTO pageDTO);
 }
 

@@ -1,11 +1,11 @@
-package cn.wjk.gulimall.common.entity.vo;
+package cn.wjk.gulimall.common.domain.vo;
 
 import lombok.Data;
 
 import java.util.List;
 
 /**
- * @Package: cn.wjk.gulimall.common.entity.vo
+ * @Package: cn.wjk.gulimall.common.domain.vo
  * @ClassName: CategoryVO
  * @Version: 1.0
  * @Author: 温嘉凯

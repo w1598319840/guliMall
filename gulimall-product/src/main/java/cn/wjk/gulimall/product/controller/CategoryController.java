@@ -1,6 +1,6 @@
 package cn.wjk.gulimall.product.controller;
 
-import cn.wjk.gulimall.common.entity.vo.CategoryVO;
+import cn.wjk.gulimall.common.domain.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import cn.wjk.gulimall.product.service.CategoryService;
