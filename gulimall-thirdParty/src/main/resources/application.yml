@@ -1,0 +1,3 @@
+#springBoot核心配置文件
+server:
+  port: 12000
