@@ -4,6 +4,7 @@ import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.common.validator.group.AddGroup;
 import cn.wjk.gulimall.common.validator.group.UpdateGroup;
+import cn.wjk.gulimall.common.validator.group.UpdateStatusGroup;
 import cn.wjk.gulimall.product.domain.entity.BrandEntity;
 import cn.wjk.gulimall.product.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,13 @@ public class BrandController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody @Validated(UpdateGroup.class) BrandEntity brand) {
+        brandService.updateById(brand);
+
+        return R.ok();
+    }
+
+    @RequestMapping("/update/status")
+    public R updateStatus(@RequestBody @Validated(UpdateStatusGroup.class) BrandEntity brand) {
         brandService.updateById(brand);
 
         return R.ok();

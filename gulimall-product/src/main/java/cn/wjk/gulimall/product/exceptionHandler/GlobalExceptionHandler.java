@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
                         return "该字段的数据不合法";
                     }
                     return fieldError.getDefaultMessage();
-                }));
+                }, (firstKey, secondKey) -> firstKey + "并且" + secondKey));
         BizHttpStatusEnum validException = BizHttpStatusEnum.VALID_EXCEPTION;
         return R.error(validException.getCode(), validException.getDesc()).put("data", map);
     }
