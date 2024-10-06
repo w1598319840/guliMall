@@ -24,6 +24,15 @@ import java.util.List;
 public class PageUtils implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
+    public PageUtils(long totalCount, long pageSize, long totalPage, long currPage, List<?> list) {
+        this.totalCount = (int) totalCount;
+        this.pageSize = (int) pageSize;
+        this.totalPage = (int) totalPage;
+        this.currPage = (int) currPage;
+        this.list = list;
+    }
+
     /**
      * 总记录数
      */

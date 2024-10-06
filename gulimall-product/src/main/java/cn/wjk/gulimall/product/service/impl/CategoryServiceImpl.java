@@ -1,6 +1,6 @@
 package cn.wjk.gulimall.product.service.impl;
 
-import cn.wjk.gulimall.common.domain.vo.CategoryVO;
+import cn.wjk.gulimall.product.domain.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 import cn.wjk.gulimall.product.dao.CategoryDao;

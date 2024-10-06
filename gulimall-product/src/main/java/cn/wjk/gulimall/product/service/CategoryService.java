@@ -1,6 +1,6 @@
 package cn.wjk.gulimall.product.service;
 
-import cn.wjk.gulimall.common.domain.vo.CategoryVO;
+import cn.wjk.gulimall.product.domain.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import com.baomidou.mybatisplus.extension.service.IService;

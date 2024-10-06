@@ -4,6 +4,7 @@ import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
+import cn.wjk.gulimall.product.domain.vo.AttrGroupVO;
 import cn.wjk.gulimall.product.service.AttrGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -53,9 +54,8 @@ public class AttrGroupController {
      */
     @RequestMapping("/info/{attrGroupId}")
     public R info(@PathVariable("attrGroupId") Long attrGroupId) {
-        AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
-
-        return R.ok().put("attrGroup", attrGroup);
+        AttrGroupVO attrGroupVO = attrGroupService.getInfo(attrGroupId);
+        return R.ok().put("attrGroup", attrGroupVO);
     }
 
     /**
