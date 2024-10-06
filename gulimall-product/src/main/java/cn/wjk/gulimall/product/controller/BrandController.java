@@ -2,6 +2,8 @@ package cn.wjk.gulimall.product.controller;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
+import cn.wjk.gulimall.common.validator.group.AddGroup;
+import cn.wjk.gulimall.common.validator.group.UpdateGroup;
 import cn.wjk.gulimall.product.domain.entity.BrandEntity;
 import cn.wjk.gulimall.product.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,7 @@ public class BrandController {
     }
 
     @RequestMapping("/save")
-    public R save(@RequestBody @Validated BrandEntity brand) {
+    public R save(@RequestBody @Validated(AddGroup.class) BrandEntity brand) {
         brandService.save(brand);
         return R.ok();
     }
@@ -56,7 +58,7 @@ public class BrandController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody BrandEntity brand) {
+    public R update(@RequestBody @Validated(UpdateGroup.class) BrandEntity brand) {
         brandService.updateById(brand);
 
         return R.ok();

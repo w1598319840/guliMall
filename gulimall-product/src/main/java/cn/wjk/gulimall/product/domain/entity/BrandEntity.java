@@ -1,11 +1,10 @@
 package cn.wjk.gulimall.product.domain.entity;
 
+import cn.wjk.gulimall.common.validator.group.AddGroup;
+import cn.wjk.gulimall.common.validator.group.UpdateGroup;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -28,18 +27,20 @@ public class BrandEntity implements Serializable {
     /**
      * 品牌id
      */
+    @NotNull(message = "修改时品牌id不能为空", groups = UpdateGroup.class)
+    @Null(message = "新增时品牌id必须为空", groups = AddGroup.class)
     @TableId
     private Long brandId;
     /**
      * 品牌名
      */
-    @NotEmpty(message = "品牌名不能为空")
+    @NotBlank(message = "品牌名不能为空", groups = {UpdateGroup.class, AddGroup.class})
     private String name;
     /**
      * 品牌logo地址
      */
-    @NotEmpty(message = "logo不能为空")
-    @URL(message = "logo必须是一个合法的url地址")
+    @NotBlank(message = "logo不能为空", groups = {AddGroup.class})
+    @URL(message = "logo必须是一个合法的url地址", groups = {UpdateGroup.class, AddGroup.class})
     private String logo;
     /**
      * 介绍
@@ -52,13 +53,15 @@ public class BrandEntity implements Serializable {
     /**
      * 检索首字母
      */
-    @Pattern(regexp = "/^[a-zA-Z]$/", message = "检索首字母必须在a~z/A~Z范围内，有且只能有一个字母")
+    @NotEmpty(groups = AddGroup.class)
+    @Pattern(regexp = "^[a-zA-Z]$", message = "检索首字母必须在a~z/A~Z范围内，有且只能有一个字母",
+            groups = {UpdateGroup.class, AddGroup.class})
     private String firstLetter;
     /**
      * 排序
      */
-    @NotNull
-    @Min(value = 0, message = "排序字段必须大于0")
+    @NotNull(groups = AddGroup.class)
+    @Min(value = 0, message = "排序字段必须大于0", groups = {UpdateGroup.class, AddGroup.class})
     private Integer sort;
 
 }
