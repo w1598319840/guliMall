@@ -15,5 +15,10 @@ import cn.wjk.gulimall.product.domain.entity.BrandEntity;
 public interface BrandService extends IService<BrandEntity> {
 
     PageUtils queryPage(PageDTO pageDTO);
+
+    /**
+     * 由于逻辑外键的存在，我们在update的时候不能简单的更新一个表
+     */
+    void updateDetail(BrandEntity brand);
 }
 

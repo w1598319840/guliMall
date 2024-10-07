@@ -1,10 +1,11 @@
 package cn.wjk.gulimall.product.service.impl;
 
-import cn.wjk.gulimall.product.domain.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
+import cn.wjk.gulimall.product.dao.CategoryBrandRelationDao;
 import cn.wjk.gulimall.product.dao.CategoryDao;
 import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
+import cn.wjk.gulimall.product.domain.vo.CategoryVO;
 import cn.wjk.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -12,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
     private final CategoryDao categoryDao;
+    private final CategoryBrandRelationDao categoryBrandRelationDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -74,5 +77,17 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public void removeCategoryByIds(List<Long> ids) {
         //使用逻辑删除
         categoryDao.deleteByIds(ids);
+    }
+
+    @Override
+    @Transactional
+    public void updateCascade(CategoryEntity category) {
+        if (category.getCatId() == null) {
+            return;
+        }
+        updateById(category);
+        //级联更新
+        //pms_category_brand_relation表
+        categoryBrandRelationDao.updateNameById(category.getName(), category.getCatId());
     }
 }

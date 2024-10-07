@@ -30,5 +30,10 @@ public interface CategoryService extends IService<CategoryEntity> {
      * @param ids 分类id列表
      */
     void removeCategoryByIds(List<Long> ids);
+
+    /**
+     * 级联更新
+     */
+    void updateCascade(CategoryEntity category);
 }
 

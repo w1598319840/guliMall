@@ -58,11 +58,21 @@ public class CategoryController {
     }
 
     /**
-     * 修改
+     * 拖拽分类以改变顺序
      */
     @PostMapping("/update/sort")
     public R update(@RequestBody List<CategoryEntity> category) {
         categoryService.updateBatchById(category);
+        return R.ok();
+    }
+
+    /**
+     * 级联修改(由于逻辑外键的存在)
+     *
+     */
+    @PostMapping("/update")
+    public R updateCascade(@RequestBody CategoryEntity category) {
+        categoryService.updateCascade(category);
         return R.ok();
     }
 
