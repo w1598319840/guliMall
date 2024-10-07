@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.controller;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.common.validator.group.AddGroup;
@@ -9,10 +10,12 @@ import cn.wjk.gulimall.product.domain.entity.BrandEntity;
 import cn.wjk.gulimall.product.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
-import java.util.Map;
 
 
 /**
@@ -32,8 +35,8 @@ public class BrandController {
      * 列表
      */
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = brandService.queryPage(params);
+    public R list(PageDTO pageDTO) {
+        PageUtils page = brandService.queryPage(pageDTO);
 
         return R.ok().put("page", page);
     }

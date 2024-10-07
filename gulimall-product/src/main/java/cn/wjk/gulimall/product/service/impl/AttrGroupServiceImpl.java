@@ -58,7 +58,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                 .and(key != null, (wrapper) ->
                         wrapper.like(AttrGroupEntity::getAttrGroupName, key)
                                 .or()
-                                .like(AttrGroupEntity::getAttrGroupId, key)
+                                .eq(AttrGroupEntity::getAttrGroupId, key)
                                 .or()
                                 .like(AttrGroupEntity::getDescript, key))
                 .orderBy(pageDTO.getSidx() != null, isAsc, AttrGroupEntity::getAttrGroupName)
