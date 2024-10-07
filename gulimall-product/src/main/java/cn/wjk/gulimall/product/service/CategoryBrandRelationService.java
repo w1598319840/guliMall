@@ -1,8 +1,8 @@
 package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
+import cn.wjk.gulimall.product.domain.dto.CategoryBrandRelationDTO;
 import cn.wjk.gulimall.product.domain.entity.CategoryBrandRelationEntity;
-import cn.wjk.gulimall.product.domain.vo.CategoryBrandRelationVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -22,6 +22,11 @@ public interface CategoryBrandRelationService extends IService<CategoryBrandRela
     /**
      * 获取品牌关联的分类
      */
-    List<CategoryBrandRelationVO> getRelatedCategoryByBrandId(Long brandId);
+    List<CategoryBrandRelationEntity> getRelatedCategoryByBrandId(Long brandId);
+
+    /**
+     * 新增品牌的关联分类
+     */
+    void saveDetail(CategoryBrandRelationDTO categoryBrandRelationDTO);
 }
 

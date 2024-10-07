@@ -12,6 +12,6 @@ import lombok.Data;
  */
 @Data
 public class CategoryBrandRelationVO {
-    private Integer categoryId;
+    private Long catelogId;
     private String catelogName;
 }

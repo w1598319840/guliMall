@@ -12,6 +12,6 @@ import lombok.Data;
  */
 @Data
 public class CategoryBrandRelationDTO {
-    private Integer brandId;
-    private Integer catelogId;
+    private Long brandId;
+    private Long catelogId;
 }

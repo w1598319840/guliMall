@@ -2,8 +2,8 @@ package cn.wjk.gulimall.product.controller;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
+import cn.wjk.gulimall.product.domain.dto.CategoryBrandRelationDTO;
 import cn.wjk.gulimall.product.domain.entity.CategoryBrandRelationEntity;
-import cn.wjk.gulimall.product.domain.vo.CategoryBrandRelationVO;
 import cn.wjk.gulimall.product.service.CategoryBrandRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -38,10 +38,9 @@ public class CategoryBrandRelationController {
 
     @GetMapping("/catelog/list")
     public R catelogList(@RequestParam("brandId") Long brandId) {
-        List<CategoryBrandRelationVO> cbr = categoryBrandRelationService.getRelatedCategoryByBrandId(brandId);
-        return R.ok().put("data", cbr);
+        List<CategoryBrandRelationEntity> list = categoryBrandRelationService.getRelatedCategoryByBrandId(brandId);
+        return R.ok().put("data", list);
     }
-
 
     /**
      * 信息
@@ -57,9 +56,8 @@ public class CategoryBrandRelationController {
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody CategoryBrandRelationEntity categoryBrandRelation) {
-        categoryBrandRelationService.save(categoryBrandRelation);
-
+    public R save(@RequestBody CategoryBrandRelationDTO categoryBrandRelationDTO) {
+        categoryBrandRelationService.saveDetail(categoryBrandRelationDTO);
         return R.ok();
     }
 
