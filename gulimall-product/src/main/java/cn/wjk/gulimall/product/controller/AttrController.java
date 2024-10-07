@@ -2,9 +2,10 @@ package cn.wjk.gulimall.product.controller;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
+import cn.wjk.gulimall.product.domain.dto.AttrDTO;
 import cn.wjk.gulimall.product.domain.entity.AttrEntity;
 import cn.wjk.gulimall.product.service.AttrService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -20,9 +21,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("product/attr")
+@RequiredArgsConstructor
 public class AttrController {
-    @Autowired
-    private AttrService attrService;
+    private final AttrService attrService;
 
     /**
      * 列表
@@ -46,11 +47,11 @@ public class AttrController {
     }
 
     /**
-     * 保存
+     * 保存规格参数以及其所属属性分组的信息
      */
     @RequestMapping("/save")
-    public R save(@RequestBody AttrEntity attr) {
-        attrService.save(attr);
+    public R saveAttrAndGroupInfo(@RequestBody AttrDTO attrDTO) {
+        attrService.saveAttrAndGroupInfo(attrDTO);
 
         return R.ok();
     }

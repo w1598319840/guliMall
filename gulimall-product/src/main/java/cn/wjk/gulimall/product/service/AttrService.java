@@ -1,8 +1,9 @@
 package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
-import com.baomidou.mybatisplus.extension.service.IService;
+import cn.wjk.gulimall.product.domain.dto.AttrDTO;
 import cn.wjk.gulimall.product.domain.entity.AttrEntity;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
 
@@ -16,5 +17,10 @@ import java.util.Map;
 public interface AttrService extends IService<AttrEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 保存规格参数以及其属性分组的信息
+     */
+    void saveAttrAndGroupInfo(AttrDTO attrDTO);
 }
 
