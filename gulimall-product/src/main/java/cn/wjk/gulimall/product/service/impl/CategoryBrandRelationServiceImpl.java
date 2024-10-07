@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     @Override
     public List<CategoryBrandRelationEntity> getRelatedCategoryByBrandId(Long brandId) {
         if (brandId == null) {
-            return null;
+            return Collections.emptyList();
         }
         return lambdaQuery().eq(CategoryBrandRelationEntity::getBrandId, brandId).list();
         /*
