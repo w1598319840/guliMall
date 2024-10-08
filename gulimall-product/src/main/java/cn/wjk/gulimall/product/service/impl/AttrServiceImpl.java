@@ -200,4 +200,62 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
         return listByIds(attrIdList);
     }
+
+    @Override
+    @Transactional
+    public PageUtils getUnrelatedAttrInTheSameCatelog(Long attrGroupId, PageDTO pageDTO) {
+        if (attrGroupId == null) {
+            return null;
+        }
+
+        final String ATTR_GROUP_ID = "attr_group_id";
+        final String CATELOG_ID = "catelog_id";
+        //1. 先查询出本分类
+        Long catelogId = attrGroupDao.selectById(attrGroupId).getCatelogId();
+
+        //2. 再查询出本分类下所有的属性的id
+        List<Long> allAttrIdList = list(new QueryWrapper<AttrEntity>().eq(CATELOG_ID, catelogId))
+                .stream().map(AttrEntity::getAttrId).toList();
+
+        //3. 再查询出本分类下所有已经被本分类下的属性分组引用过的属性的id
+        //3.1. 查询出本分类下所有的属性分组的id
+        List<Long> allAttrGroupIdList = attrGroupDao.selectList(new QueryWrapper<AttrGroupEntity>()
+                .eq(CATELOG_ID, catelogId)
+        ).stream().map(AttrGroupEntity::getAttrGroupId).toList();
+        //3.2. 查询出本分类下的所有属性分组引用过的属性id
+        List<Long> relatedAttrIdList = attrAttrgroupRelationDao.selectList(new QueryWrapper<AttrAttrgroupRelationEntity>()
+                        .in(ATTR_GROUP_ID, allAttrGroupIdList))
+                .stream().map(AttrAttrgroupRelationEntity::getAttrId).toList();
+
+        //4. 然后把分页参数整好
+        boolean isAsc = "asc".equalsIgnoreCase(pageDTO.getOrder());
+        Page<AttrEntity> page = new Page<>(pageDTO.getPage(), pageDTO.getLimit());
+        QueryWrapper<AttrEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderBy(StringUtils.isNotEmpty(pageDTO.getSidx()), isAsc, pageDTO.getSidx());
+        String key = pageDTO.getKey();
+        queryWrapper.and(StringUtils.isNotEmpty(key), wrapper ->
+                wrapper.eq("attr_id", key)
+                        .or()
+                        .like("attr_name", key)
+                        .or()
+                        .like("value_select", key)
+        );
+
+        //5. 最后整点其他的查询参数
+        //5.1. 所有要查的属性的id(本分类下所有属性id-本分类下已经被其他属性分组关联过的属性id)
+        List<Long> attrIds = allAttrIdList.stream().filter(attrId -> !relatedAttrIdList.contains(attrId)).toList();
+        if (attrIds.isEmpty()) {
+            //当前分类下已经没有没有被关联过的属性了
+            return null;
+        }
+        queryWrapper.in("attr_id", attrIds);
+        //5.2. 要是基本属性
+        queryWrapper.eq("attr_type", ProductConstant.AttrType.ATTR_TYPE_BASE.getCode());
+
+        //6. 总算搞完了，广快查询
+        page(page, queryWrapper);
+
+        //7. 返回结果
+        return new PageUtils(page);
+    }
 }

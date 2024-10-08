@@ -114,4 +114,15 @@ public class AttrGroupController {
         attrAttrgroupRelationService.deleteAttrRelation(relationDTOS);
         return R.ok();
     }
+
+    /**
+     * 获取属性分组里面还没有关联的本分类里面的其他基本属性，方便添加新的关联
+     *
+     * @param attrGroupId 当前属性分组
+     */
+    @GetMapping("/{attrGroupId}/noattr/relation")
+    public R getUnrelatedAttrInTheSameCatelog(@PathVariable("attrGroupId") Long attrGroupId, PageDTO pageDTO) {
+        PageUtils pageUtils = attrService.getUnrelatedAttrInTheSameCatelog(attrGroupId, pageDTO);
+        return R.ok().put("page", pageUtils);
+    }
 }

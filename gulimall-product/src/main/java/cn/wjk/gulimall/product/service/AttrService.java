@@ -46,5 +46,14 @@ public interface AttrService extends IService<AttrEntity> {
      * 获取指定属性分组的所有属性
      */
     List<AttrEntity> getAllAttrRelatedToAttrGroup(Long attrGroupId);
+
+    /**
+     * 获取属性分组里面还没有关联的本分类里面的其他基本属性，方便添加新的关联
+     *
+     * @param attrGroupId 当前的属性分组
+     * @param pageDTO 分页参数
+     * @return 返回本分类中当前属性分组还未关联的基本属性
+     */
+    PageUtils getUnrelatedAttrInTheSameCatelog(Long attrGroupId, PageDTO pageDTO);
 }
 
