@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.service.impl;
 
+import cn.wjk.gulimall.common.constant.ProductConstant;
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
@@ -59,6 +60,10 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         BeanUtils.copyProperties(attrDTO, attrEntity);
         this.save(attrEntity);
         //保存分组信息
+        if (attrDTO.getAttrType().equals(ProductConstant.AttrType.ATTR_TYPE_SALE.getCode())) {
+            //如果时销售属性，直接返回，不需要保存分组信息
+            return;
+        }
         AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
         relationEntity.setAttrId(attrEntity.getAttrId());
         relationEntity.setAttrGroupId(attrDTO.getAttrGroupId());
@@ -66,23 +71,29 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     }
 
     @Override
-    public PageUtils getCatelogAttr(Long catelogId, PageDTO pageDTO) {
-        if (catelogId == null) {
+    public PageUtils getCatelogAttr(Long catelogId, PageDTO pageDTO, String attrType) {
+        if (catelogId == null
+                || !(attrType.equalsIgnoreCase(ProductConstant.AttrType.ATTR_TYPE_BASE.getType())
+                || attrType.equalsIgnoreCase(ProductConstant.AttrType.ATTR_TYPE_SALE.getType()))) {
             return null;
         }
+        int type = attrType.equalsIgnoreCase(ProductConstant.AttrType.ATTR_TYPE_BASE.getType())
+                ? ProductConstant.AttrType.ATTR_TYPE_BASE.getCode()
+                : ProductConstant.AttrType.ATTR_TYPE_SALE.getCode();
         boolean isAsc = "asc".equals(pageDTO.getOrder());
         String key = pageDTO.getKey();
         Page<AttrEntity> page = new Page<>(pageDTO.getPage(), pageDTO.getLimit());
         QueryWrapper<AttrEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(!catelogId.equals(0L), "catelog_id", catelogId);
-        queryWrapper.orderBy(StringUtils.isNotEmpty(pageDTO.getSidx()), isAsc, pageDTO.getSidx());
-        queryWrapper.and(StringUtils.isNotEmpty(key), wrapper ->
-                wrapper.eq("attr_id", key)
-                        .or()
-                        .like("attr_name", key)
-                        .or()
-                        .like("value_select", key)
-        );
+        queryWrapper.eq(!catelogId.equals(0L), "catelog_id", catelogId)
+                .eq("attr_type", type)
+                .orderBy(StringUtils.isNotEmpty(pageDTO.getSidx()), isAsc, pageDTO.getSidx())
+                .and(StringUtils.isNotEmpty(key), wrapper ->
+                        wrapper.eq("attr_id", key)
+                                .or()
+                                .like("attr_name", key)
+                                .or()
+                                .like("value_select", key)
+                );
         page(page, queryWrapper);
         List<AttrEntity> entities = page.getRecords();
 
@@ -135,11 +146,13 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrVO attrVO = new AttrVO();
         BeanUtils.copyProperties(attrEntity, attrVO);
         attrVO.setCatelogPath(categoryService.getCatelogPathById(attrEntity.getCatelogId()));
-        AttrAttrgroupRelationEntity relationEntity = attrAttrgroupRelationDao
-                .selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId));
-        if (relationEntity != null) {
-            attrVO.setAttrGroupId(relationEntity.getAttrGroupId());
+        if (attrEntity.getAttrType() == ProductConstant.AttrType.ATTR_TYPE_SALE.getCode()) {
+            //如果是销售属性，不需要查询分组信息
+            return attrVO;
         }
+        attrVO.setAttrGroupId(attrAttrgroupRelationDao.selectOne(
+                new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId)).getAttrGroupId()
+        );
         return attrVO;
     }
 
@@ -159,13 +172,14 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrAttrgroupRelationEntity relationEntity = attrAttrgroupRelationDao.selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>()
                 .eq("attr_id", attrId)
         );
-
-        if (relationEntity == null && attrGroupId != null) {
+        if (relationEntity == null && attrDTO.getAttrType() == ProductConstant.AttrType.ATTR_TYPE_BASE.getCode()) {
+            //关联表中不存在关联数据并且是规格参数时，才需要向关联表中插入数据
             relationEntity = new AttrAttrgroupRelationEntity(null, attrId, attrGroupId, null);
             attrAttrgroupRelationDao.insert(relationEntity);
             return;
         }
-        if (relationEntity != null && attrGroupId != null) {
+        if (relationEntity != null && attrDTO.getAttrType() == ProductConstant.AttrType.ATTR_TYPE_BASE.getCode()) {
+            //关联表中存在数据并且是规格参数时，才需要修改关联表中的数据
             attrAttrgroupRelationDao.update(new UpdateWrapper<AttrAttrgroupRelationEntity>()
                     .set("attr_group_id", attrGroupId)
                     .eq("attr_id", attrId)

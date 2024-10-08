@@ -27,8 +27,9 @@ public interface AttrService extends IService<AttrEntity> {
 
     /**
      * 获取分类的规格参数
+     * attrType: base(规格参数)/sale(销售属性)
      */
-    PageUtils getCatelogAttr(Long catelogId, PageDTO pageDTO);
+    PageUtils getCatelogAttr(Long catelogId, PageDTO pageDTO, String attrType);
 
     /**
      * 获取详细信息

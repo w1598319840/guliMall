@@ -41,12 +41,13 @@ public class AttrController {
      * @param catelogId 分类id，若为0则查所有
      * @param pageDTO 分页查询参数
      */
-    @GetMapping("/base/list/{catelogId}")
-    public R getCatelogAttr(@PathVariable("catelogId") Long catelogId, PageDTO pageDTO) {
-        PageUtils pageUtils = attrService.getCatelogAttr(catelogId, pageDTO);
+    @GetMapping("/{attrType}/list/{catelogId}")
+    public R getCatelogAttr(@PathVariable("attrType") String attrType,
+                            @PathVariable("catelogId") Long catelogId,
+                            PageDTO pageDTO) {
+        PageUtils pageUtils = attrService.getCatelogAttr(catelogId, pageDTO, attrType);
         return R.ok().put("page", pageUtils);
     }
-
 
     /**
      * 信息
