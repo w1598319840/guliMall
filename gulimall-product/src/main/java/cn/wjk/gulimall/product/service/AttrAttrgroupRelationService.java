@@ -1,9 +1,11 @@
 package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
-import com.baomidou.mybatisplus.extension.service.IService;
+import cn.wjk.gulimall.product.domain.dto.AttrAttrgroupRelationDTO;
 import cn.wjk.gulimall.product.domain.entity.AttrAttrgroupRelationEntity;
+import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,10 @@ import java.util.Map;
 public interface AttrAttrgroupRelationService extends IService<AttrAttrgroupRelationEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 删除属性与分组之间的关联信息
+     */
+    void deleteAttrRelation(List<AttrAttrgroupRelationDTO> relationDTOs);
 }
 

@@ -3,9 +3,11 @@ package cn.wjk.gulimall.product.controller;
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
+import cn.wjk.gulimall.product.domain.dto.AttrAttrgroupRelationDTO;
 import cn.wjk.gulimall.product.domain.entity.AttrEntity;
 import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrGroupVO;
+import cn.wjk.gulimall.product.service.AttrAttrgroupRelationService;
 import cn.wjk.gulimall.product.service.AttrGroupService;
 import cn.wjk.gulimall.product.service.AttrService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import java.util.Map;
 public class AttrGroupController {
     private final AttrGroupService attrGroupService;
     private final AttrService attrService;
+    private final AttrAttrgroupRelationService attrAttrgroupRelationService;
 
     /**
      * 列表
@@ -101,5 +104,14 @@ public class AttrGroupController {
     public R getAllAttrRelatedToAttrGroup(@PathVariable("attrGroupId") Long attrGroupId) {
         List<AttrEntity> attrEntities = attrService.getAllAttrRelatedToAttrGroup(attrGroupId);
         return R.ok().put("data", attrEntities);
+    }
+
+    /**
+     * 删除属性与分组之间的关联信息
+     */
+    @PostMapping("/attr/relation/delete")
+    public R deleteAttrRelation(@RequestBody List<AttrAttrgroupRelationDTO> relationDTOS) {
+        attrAttrgroupRelationService.deleteAttrRelation(relationDTOS);
+        return R.ok();
     }
 }
