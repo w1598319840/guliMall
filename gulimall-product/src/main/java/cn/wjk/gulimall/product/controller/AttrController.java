@@ -5,6 +5,7 @@ import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
 import cn.wjk.gulimall.product.domain.entity.AttrEntity;
+import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import cn.wjk.gulimall.product.service.AttrService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -54,9 +55,9 @@ public class AttrController {
      */
     @RequestMapping("/info/{attrId}")
     public R info(@PathVariable("attrId") Long attrId) {
-        AttrEntity attr = attrService.getById(attrId);
+        AttrVO attrVO = attrService.getDetail(attrId);
 
-        return R.ok().put("attr", attr);
+        return R.ok().put("attr", attrVO);
     }
 
     /**

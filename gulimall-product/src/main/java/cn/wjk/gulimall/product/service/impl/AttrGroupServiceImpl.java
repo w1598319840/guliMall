@@ -5,7 +5,6 @@ import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 import cn.wjk.gulimall.product.dao.AttrGroupDao;
 import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
-import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrGroupVO;
 import cn.wjk.gulimall.product.service.AttrGroupService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -17,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 
@@ -72,27 +70,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         AttrGroupEntity attrGroupEntity = lambdaQuery().eq(AttrGroupEntity::getAttrGroupId, attrGroupId).one();
         AttrGroupVO attrGroupVO = new AttrGroupVO();
         BeanUtils.copyProperties(attrGroupEntity, attrGroupVO);
-        attrGroupVO.setCatelogPath(getCatelogPathById(attrGroupEntity.getCatelogId()));
+        attrGroupVO.setCatelogPath(categoryService.getCatelogPathById(attrGroupEntity.getCatelogId()));
         return attrGroupVO;
-    }
-
-    /**
-     * 根据catelogId获取该catelog相对于一级catelog的全路径
-     */
-    public Long[] getCatelogPathById(Long catelogId) {
-        ArrayList<Long> list = new ArrayList<>();
-        list.addFirst(catelogId);
-        long currentCatelogId = catelogId;
-        do {
-            CategoryEntity category = categoryService.lambdaQuery()
-                    .eq(CategoryEntity::getCatId, currentCatelogId)
-                    .one();
-            if (category.getCatLevel() == 1) {
-                break;
-            }
-            currentCatelogId = category.getParentCid();
-            list.addFirst(currentCatelogId);
-        } while (true);
-        return list.toArray(new Long[0]);
     }
 }

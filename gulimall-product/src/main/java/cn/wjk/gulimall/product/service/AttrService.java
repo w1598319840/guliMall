@@ -4,6 +4,7 @@ import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
 import cn.wjk.gulimall.product.domain.entity.AttrEntity;
+import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -28,5 +29,10 @@ public interface AttrService extends IService<AttrEntity> {
      * 获取分类的规格参数
      */
     PageUtils getCatelogAttr(Long catelogId, PageDTO pageDTO);
+
+    /**
+     * 获取详细信息
+     */
+    AttrVO getDetail(Long attrId);
 }
 

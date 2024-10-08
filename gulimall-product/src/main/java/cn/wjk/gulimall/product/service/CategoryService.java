@@ -1,8 +1,8 @@
 package cn.wjk.gulimall.product.service;
 
-import cn.wjk.gulimall.product.domain.vo.CategoryVO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
+import cn.wjk.gulimall.product.domain.vo.CategoryVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -35,5 +35,10 @@ public interface CategoryService extends IService<CategoryEntity> {
      * 级联更新
      */
     void updateCascade(CategoryEntity category);
+
+    /**
+     * 根据catelogId获取该catelog相对于一级catelog的全路径
+     */
+    Long[] getCatelogPathById(Long catelogId);
 }
 

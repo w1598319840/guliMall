@@ -15,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -89,5 +90,23 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         //级联更新
         //pms_category_brand_relation表
         categoryBrandRelationDao.updateNameById(category.getName(), category.getCatId());
+    }
+
+    @Override
+    public Long[] getCatelogPathById(Long catelogId) {
+        ArrayList<Long> list = new ArrayList<>();
+        list.addFirst(catelogId);
+        long currentCatelogId = catelogId;
+        do {
+            CategoryEntity category = lambdaQuery()
+                    .eq(CategoryEntity::getCatId, currentCatelogId)
+                    .one();
+            if (category.getCatLevel() == 1) {
+                break;
+            }
+            currentCatelogId = category.getParentCid();
+            list.addFirst(currentCatelogId);
+        } while (true);
+        return list.toArray(new Long[0]);
     }
 }

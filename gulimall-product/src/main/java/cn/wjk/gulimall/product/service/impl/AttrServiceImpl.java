@@ -14,6 +14,7 @@ import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
 import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import cn.wjk.gulimall.product.service.AttrService;
+import cn.wjk.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -37,6 +38,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     private final AttrAttrgroupRelationDao attrAttrgroupRelationDao;
     private final CategoryDao categoryDao;
     private final AttrGroupDao attrGroupDao;
+    private final CategoryService categoryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -124,5 +126,19 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }).toList();
 
         return new PageUtils(page.getTotal(), page.getSize(), page.getPages(), page.getCurrent(), attrVOs);
+    }
+
+    @Override
+    public AttrVO getDetail(Long attrId) {
+        AttrEntity attrEntity = getById(attrId);
+        AttrVO attrVO = new AttrVO();
+        BeanUtils.copyProperties(attrEntity, attrVO);
+        attrVO.setCatelogPath(categoryService.getCatelogPathById(attrEntity.getCatelogId()));
+        AttrAttrgroupRelationEntity relationEntity = attrAttrgroupRelationDao
+                .selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId));
+        if (relationEntity != null) {
+            attrVO.setAttrGroupId(relationEntity.getAttrGroupId());
+        }
+        return attrVO;
     }
 }
