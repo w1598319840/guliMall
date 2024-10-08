@@ -27,10 +27,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -185,5 +182,22 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
                     .eq("attr_id", attrId)
             );
         }
+    }
+
+    @Override
+    public List<AttrEntity> getAllAttrRelatedToAttrGroup(Long attrGroupId) {
+        if (attrGroupId == null) {
+            return Collections.emptyList();
+        }
+
+        List<Long> attrIdList = attrAttrgroupRelationDao.selectList(
+                new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", attrGroupId)
+        ).stream().map(AttrAttrgroupRelationEntity::getAttrId).toList();
+
+        if (attrIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return listByIds(attrIdList);
     }
 }

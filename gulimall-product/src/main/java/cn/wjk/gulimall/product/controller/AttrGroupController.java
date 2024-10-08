@@ -3,13 +3,16 @@ package cn.wjk.gulimall.product.controller;
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
+import cn.wjk.gulimall.product.domain.entity.AttrEntity;
 import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrGroupVO;
 import cn.wjk.gulimall.product.service.AttrGroupService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cn.wjk.gulimall.product.service.AttrService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -22,9 +25,10 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("product/attrgroup")
+@RequiredArgsConstructor
 public class AttrGroupController {
-    @Autowired
-    private AttrGroupService attrGroupService;
+    private final AttrGroupService attrGroupService;
+    private final AttrService attrService;
 
     /**
      * 列表
@@ -88,4 +92,14 @@ public class AttrGroupController {
         return R.ok();
     }
 
+    /**
+     * 获取指定属性分组的所有属性
+     *
+     * @param attrGroupId 属性分组的id
+     */
+    @GetMapping("/{attrGroupId}/attr/relation")
+    public R getAllAttrRelatedToAttrGroup(@PathVariable("attrGroupId") Long attrGroupId) {
+        List<AttrEntity> attrEntities = attrService.getAllAttrRelatedToAttrGroup(attrGroupId);
+        return R.ok().put("data", attrEntities);
+    }
 }

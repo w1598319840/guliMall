@@ -7,6 +7,7 @@ import cn.wjk.gulimall.product.domain.entity.AttrEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,5 +41,10 @@ public interface AttrService extends IService<AttrEntity> {
      * 级联修改
      */
     void updateCascade(AttrDTO attrDTO);
+
+    /**
+     * 获取指定属性分组的所有属性
+     */
+    List<AttrEntity> getAllAttrRelatedToAttrGroup(Long attrGroupId);
 }
 

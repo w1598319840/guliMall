@@ -7,6 +7,7 @@ import cn.wjk.gulimall.product.dao.AttrGroupDao;
 import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrGroupVO;
 import cn.wjk.gulimall.product.service.AttrGroupService;
+import cn.wjk.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,7 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
 
-    private final CategoryServiceImpl categoryService;
+    private final CategoryService categoryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
