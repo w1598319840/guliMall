@@ -34,5 +34,10 @@ public interface AttrService extends IService<AttrEntity> {
      * 获取详细信息
      */
     AttrVO getDetail(Long attrId);
+
+    /**
+     * 级联修改
+     */
+    void updateCascade(AttrDTO attrDTO);
 }
 

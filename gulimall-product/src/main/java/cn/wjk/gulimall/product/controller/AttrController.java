@@ -4,7 +4,6 @@ import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
-import cn.wjk.gulimall.product.domain.entity.AttrEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import cn.wjk.gulimall.product.service.AttrService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,6 @@ public class AttrController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = attrService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 
@@ -66,17 +64,15 @@ public class AttrController {
     @RequestMapping("/save")
     public R saveAttrAndGroupInfo(@RequestBody AttrDTO attrDTO) {
         attrService.saveAttrAndGroupInfo(attrDTO);
-
         return R.ok();
     }
 
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody AttrEntity attr) {
-        attrService.updateById(attr);
-
+    @PostMapping("/update")
+    public R update(@RequestBody AttrDTO attrDTO) {
+        attrService.updateCascade(attrDTO);
         return R.ok();
     }
 
@@ -86,8 +82,6 @@ public class AttrController {
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] attrIds) {
         attrService.removeByIds(Arrays.asList(attrIds));
-
         return R.ok();
     }
-
 }

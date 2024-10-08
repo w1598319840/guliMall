@@ -2,7 +2,9 @@ package cn.wjk.gulimall.product.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,9 +18,11 @@ import java.io.Serializable;
  */
 @Data
 @TableName("pms_attr_attrgroup_relation")
+@AllArgsConstructor
+@NoArgsConstructor
 public class AttrAttrgroupRelationEntity implements Serializable {
     @Serial
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * id

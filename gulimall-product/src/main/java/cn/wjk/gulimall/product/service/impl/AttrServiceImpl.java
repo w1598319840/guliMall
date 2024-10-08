@@ -16,6 +16,7 @@ import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import cn.wjk.gulimall.product.service.AttrService;
 import cn.wjk.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -140,5 +141,35 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             attrVO.setAttrGroupId(relationEntity.getAttrGroupId());
         }
         return attrVO;
+    }
+
+    @Override
+    @Transactional
+    public void updateCascade(AttrDTO attrDTO) {
+        Long attrId = attrDTO.getAttrId();
+        Long attrGroupId = attrDTO.getAttrGroupId();
+        if (attrId == null) {
+            return;
+        }
+        AttrEntity attrEntity = new AttrEntity();
+        BeanUtils.copyProperties(attrDTO, attrEntity);
+        updateById(attrEntity);
+        //级联修改
+        //pms_attr_attrgroup_relation表
+        AttrAttrgroupRelationEntity relationEntity = attrAttrgroupRelationDao.selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>()
+                .eq("attr_id", attrId)
+        );
+
+        if (relationEntity == null && attrGroupId != null) {
+            relationEntity = new AttrAttrgroupRelationEntity(null, attrId, attrGroupId, null);
+            attrAttrgroupRelationDao.insert(relationEntity);
+            return;
+        }
+        if (relationEntity != null && attrGroupId != null) {
+            attrAttrgroupRelationDao.update(new UpdateWrapper<AttrAttrgroupRelationEntity>()
+                    .set("attr_group_id", attrGroupId)
+                    .eq("attr_id", attrId)
+            );
+        }
     }
 }
