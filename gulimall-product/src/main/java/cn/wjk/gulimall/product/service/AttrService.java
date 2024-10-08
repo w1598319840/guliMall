@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.service;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
 import cn.wjk.gulimall.product.domain.entity.AttrEntity;
@@ -22,5 +23,10 @@ public interface AttrService extends IService<AttrEntity> {
      * 保存规格参数以及其属性分组的信息
      */
     void saveAttrAndGroupInfo(AttrDTO attrDTO);
+
+    /**
+     * 获取分类的规格参数
+     */
+    PageUtils getCatelogAttr(Long catelogId, PageDTO pageDTO);
 }
 

@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.controller;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
@@ -33,6 +34,18 @@ public class AttrController {
         PageUtils page = attrService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 获取分类的规格参数
+     *
+     * @param catelogId 分类id，若为0则查所有
+     * @param pageDTO 分页查询参数
+     */
+    @GetMapping("/base/list/{catelogId}")
+    public R getCatelogAttr(@PathVariable("catelogId") Long catelogId, PageDTO pageDTO) {
+        PageUtils pageUtils = attrService.getCatelogAttr(catelogId, pageDTO);
+        return R.ok().put("page", pageUtils);
     }
 
 

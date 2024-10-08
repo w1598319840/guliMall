@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public R handleException(Exception e) {
-        log.error("出现异常:{}", e.getMessage());
+        log.error(e.getMessage(), e);
         BizHttpStatusEnum unknownException = BizHttpStatusEnum.UNKNOWN_EXCEPTION;
         return R.error(unknownException.getCode(), unknownException.getDesc());
     }

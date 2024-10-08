@@ -13,5 +13,13 @@
         <result property="catelogId" column="catelog_id"/>
     </resultMap>
 
+    <select id="selectGroupByAttrId" resultType="cn.wjk.gulimall.product.domain.entity.AttrGroupEntity">
+        select pag.attr_group_id, pag.attr_group_name, pag.sort, pag.descript, pag.icon, pag.catelog_id
+        from pms_attr_group as pag
+                 join pms_attr_attrgroup_relation as paar
+                      on pag.attr_group_id = paar.attr_group_id
+        where paar.attr_id = #{attrId}
+    </select>
+
 
 </mapper>

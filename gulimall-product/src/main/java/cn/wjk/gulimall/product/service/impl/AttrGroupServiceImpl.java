@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -53,17 +54,16 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             xxx xxx
          */
         Page<AttrGroupEntity> page = new Page<>(pageDTO.getPage(), pageDTO.getLimit());
-        lambdaQuery()
-                .eq(!catelogId.equals(0L), AttrGroupEntity::getCatelogId, catelogId)
-                .and(key != null, (wrapper) ->
-                        wrapper.like(AttrGroupEntity::getAttrGroupName, key)
-                                .or()
-                                .eq(AttrGroupEntity::getAttrGroupId, key)
-                                .or()
-                                .like(AttrGroupEntity::getDescript, key))
-                .orderBy(pageDTO.getSidx() != null, isAsc, AttrGroupEntity::getAttrGroupName)
-                .page(page);
-
+        QueryWrapper<AttrGroupEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(!catelogId.equals(0L), "catelog_id", catelogId);
+        queryWrapper.orderBy(StringUtils.isNotEmpty(pageDTO.getSidx()), isAsc, pageDTO.getSidx());
+        queryWrapper.and(StringUtils.isNotEmpty(key), wrapper ->
+                wrapper.eq("attr_group_id", key)
+                        .or()
+                        .like("attr_group_name", key)
+                        .or()
+                        .like("descript", key));
+        page(page, queryWrapper);
         return new PageUtils(page);
     }
 
