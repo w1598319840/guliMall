@@ -125,4 +125,13 @@ public class AttrGroupController {
         PageUtils pageUtils = attrService.getUnrelatedAttrInTheSameCatelog(attrGroupId, pageDTO);
         return R.ok().put("page", pageUtils);
     }
+
+    /**
+     * 添加关系
+     */
+    @PostMapping("/attr/relation")
+    public R addRelation(@RequestBody List<AttrAttrgroupRelationDTO> relationDTOs) {
+        attrAttrgroupRelationService.addRelation(relationDTOs);
+        return R.ok();
+    }
 }

@@ -23,5 +23,10 @@ public interface AttrAttrgroupRelationService extends IService<AttrAttrgroupRela
      * 删除属性与分组之间的关联信息
      */
     void deleteAttrRelation(List<AttrAttrgroupRelationDTO> relationDTOs);
+
+    /**
+     * 添加关系
+     */
+    void addRelation(List<AttrAttrgroupRelationDTO> relationDTOs);
 }
 

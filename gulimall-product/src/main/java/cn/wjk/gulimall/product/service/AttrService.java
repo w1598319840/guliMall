@@ -55,5 +55,10 @@ public interface AttrService extends IService<AttrEntity> {
      * @return 返回本分类中当前属性分组还未关联的基本属性
      */
     PageUtils getUnrelatedAttrInTheSameCatelog(Long attrGroupId, PageDTO pageDTO);
+
+    /**
+     * 级联删除
+     */
+    void removeCascadeByIds(List<Long> attrIds);
 }
 

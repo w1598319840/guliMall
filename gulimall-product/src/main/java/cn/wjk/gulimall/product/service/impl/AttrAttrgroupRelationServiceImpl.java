@@ -9,7 +9,9 @@ import cn.wjk.gulimall.product.service.AttrAttrgroupRelationService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -36,5 +38,16 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
                     .eq("attr_group_id", relationDTO.getAttrGroupId()));
         }
         remove(queryWrapper);
+    }
+
+    @Override
+    @Transactional
+    public void addRelation(List<AttrAttrgroupRelationDTO> relationDTOs) {
+        List<AttrAttrgroupRelationEntity> relationEntities = relationDTOs.stream().map(relationDTO -> {
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+            BeanUtils.copyProperties(relationDTO, relationEntity);
+            return relationEntity;
+        }).toList();
+        saveBatch(relationEntities);
     }
 }

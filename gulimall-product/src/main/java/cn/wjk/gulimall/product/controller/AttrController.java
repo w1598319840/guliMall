@@ -82,7 +82,7 @@ public class AttrController {
      */
     @RequestMapping("/delete")
     public R delete(@RequestBody Long[] attrIds) {
-        attrService.removeByIds(Arrays.asList(attrIds));
+        attrService.removeCascadeByIds(Arrays.asList(attrIds));
         return R.ok();
     }
 }

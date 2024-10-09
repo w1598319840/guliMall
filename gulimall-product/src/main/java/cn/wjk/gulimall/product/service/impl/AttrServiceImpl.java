@@ -61,6 +61,10 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             //如果时销售属性，直接返回，不需要保存分组信息
             return;
         }
+        if (attrDTO.getAttrGroupId() == null) {
+            //没有选分组信息，也不需要保存分组信息
+            return;
+        }
         AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
         relationEntity.setAttrId(attrEntity.getAttrId());
         relationEntity.setAttrGroupId(attrDTO.getAttrGroupId());
@@ -147,9 +151,13 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             //如果是销售属性，不需要查询分组信息
             return attrVO;
         }
-        attrVO.setAttrGroupId(attrAttrgroupRelationDao.selectOne(
-                new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId)).getAttrGroupId()
-        );
+        AttrAttrgroupRelationEntity relationEntity = attrAttrgroupRelationDao.selectOne(
+                new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId));
+        if (relationEntity == null) {
+            //不存在分组关联关系，就不添加
+            return attrVO;
+        }
+        attrVO.setAttrGroupId(relationEntity.getAttrGroupId());
         return attrVO;
     }
 
@@ -246,7 +254,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         List<Long> attrIds = allAttrIdList.stream().filter(attrId -> !relatedAttrIdList.contains(attrId)).toList();
         if (attrIds.isEmpty()) {
             //当前分类下已经没有没有被关联过的属性了
-            return null;
+            return new PageUtils(0, 10, 0, 1, Collections.emptyList());
         }
         queryWrapper.in("attr_id", attrIds);
         //5.2. 要是基本属性
@@ -257,5 +265,17 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
         //7. 返回结果
         return new PageUtils(page);
+    }
+
+    @Override
+    @Transactional
+    public void removeCascadeByIds(List<Long> attrIds) {
+        if (attrIds == null || attrIds.isEmpty()) {
+            return;
+        }
+        //删除属性本身
+        removeByIds(attrIds);
+        //删除属性关联信息
+        attrAttrgroupRelationDao.delete(new QueryWrapper<AttrAttrgroupRelationEntity>().in("attr_id", attrIds));
     }
 }
