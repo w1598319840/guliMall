@@ -4,6 +4,8 @@ import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.dto.CategoryBrandRelationDTO;
 import cn.wjk.gulimall.product.domain.entity.CategoryBrandRelationEntity;
+import cn.wjk.gulimall.product.domain.vo.BrandVO;
+import cn.wjk.gulimall.product.service.BrandService;
 import cn.wjk.gulimall.product.service.CategoryBrandRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CategoryBrandRelationController {
     private final CategoryBrandRelationService categoryBrandRelationService;
+    private final BrandService brandService;
 
     /**
      * 列表
@@ -40,6 +43,15 @@ public class CategoryBrandRelationController {
     public R catelogList(@RequestParam("brandId") Long brandId) {
         List<CategoryBrandRelationEntity> list = categoryBrandRelationService.getRelatedCategoryByBrandId(brandId);
         return R.ok().put("data", list);
+    }
+
+    /**
+     * 获取分类关联的品牌
+     */
+    @GetMapping("/brands/list")
+    public R brandsList(@RequestParam("catId") Long catId) {
+        List<BrandVO> brandVOs = brandService.brandsList(catId);
+        return R.ok().put("data", brandVOs);
     }
 
     /**
