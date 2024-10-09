@@ -134,4 +134,15 @@ public class AttrGroupController {
         attrAttrgroupRelationService.addRelation(relationDTOs);
         return R.ok();
     }
+
+    /**
+     * 获取分类下所有分组及每个分组的属性
+     *
+     * @param catelogId 分类id
+     */
+    @GetMapping("/{catelog}/withattr")
+    public R getAttrGroupWithAttr(@PathVariable("catelog") Long catelogId) {
+        List<AttrGroupVO> attrGroupVOs = attrGroupService.getAttrGroupWithAttr(catelogId);
+        return R.ok().put("data", attrGroupVOs);
+    }
 }

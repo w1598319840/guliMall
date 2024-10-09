@@ -6,6 +6,7 @@ import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrGroupVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,5 +23,10 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils listByCatelogId(Long catelogId, PageDTO pageDTO);
 
     AttrGroupVO getInfo(Long attrGroupId);
+
+    /**
+     * 获取分类下所有分组及每个分组的属性
+     */
+    List<AttrGroupVO> getAttrGroupWithAttr(Long catelogId);
 }
 
