@@ -7,8 +7,12 @@ spring:
       routes:
 #        - id: gulimall-coupon
 #          uri: lb://gulimall-coupon
-#        - id: gulimall-member
-#          uri: lb://gulimall-member
+        - id: gulimall-member
+          uri: lb://gulimall-member
+          predicates:
+            - Path=/api/member/**
+          filters:
+            - StripPrefix=1
 #        - id: gulimall-order
 #          uri: lb://gulimall-order
         - id: gulimall-product

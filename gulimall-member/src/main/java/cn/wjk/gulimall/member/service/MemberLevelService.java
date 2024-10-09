@@ -1,10 +1,9 @@
 package cn.wjk.gulimall.member.service;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.member.entity.MemberLevelEntity;
-
-import java.util.Map;
 
 /**
  * 会员等级
@@ -15,6 +14,9 @@ import java.util.Map;
  */
 public interface MemberLevelService extends IService<MemberLevelEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+    /**
+     * 分页查询
+     */
+    PageUtils queryPage(PageDTO pageDTO);
 }
 
