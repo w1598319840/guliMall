@@ -2,6 +2,8 @@ package cn.wjk.gulimall.common.domain.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @Package: cn.wjk.gulimall.common.domain.dto
  * @ClassName: PageDTO
@@ -44,4 +46,12 @@ public class PageDTO {
      * 商品状态
      */
     private Integer status;
+    /**
+     * 最低价格
+     */
+    private BigDecimal min;
+    /**
+     * 最高价格
+     */
+    private BigDecimal max;
 }

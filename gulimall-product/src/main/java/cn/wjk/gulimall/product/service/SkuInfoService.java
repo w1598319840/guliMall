@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.service;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.product.domain.entity.SkuInfoEntity;
@@ -16,5 +17,10 @@ import java.util.Map;
 public interface SkuInfoService extends IService<SkuInfoEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 分页查询sku
+     */
+    PageUtils pageQuerySku(PageDTO pageDTO);
 }
 
