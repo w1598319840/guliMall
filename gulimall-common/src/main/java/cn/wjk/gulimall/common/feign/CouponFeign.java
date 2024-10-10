@@ -1,6 +1,14 @@
 package cn.wjk.gulimall.common.feign;
 
+import cn.wjk.gulimall.common.domain.to.SkuReductionTO;
+import cn.wjk.gulimall.common.domain.to.SpuBoundsTO;
+import cn.wjk.gulimall.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 /**
  * @Package: cn.wjk.gulimall.common.feign
@@ -12,4 +20,12 @@ import org.springframework.cloud.openfeign.FeignClient;
  */
 @FeignClient("gulimall-coupon")
 public interface CouponFeign {
+    /**
+     * 保存Spu的Bounds数据
+     */
+    @RequestMapping("/coupon/spubounds/save")
+    R saveSpuBounds(@RequestBody SpuBoundsTO spuBoundsTO);
+
+    @PostMapping("/coupon/skufullreduction/save/reduction")
+    R saveSkuReduction(@RequestBody List<SkuReductionTO> skuReductionTO);
 }

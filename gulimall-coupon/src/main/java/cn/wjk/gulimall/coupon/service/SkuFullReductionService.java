@@ -1,9 +1,11 @@
 package cn.wjk.gulimall.coupon.service;
 
+import cn.wjk.gulimall.common.domain.to.SkuReductionTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.coupon.entity.SkuFullReductionEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,10 @@ import java.util.Map;
 public interface SkuFullReductionService extends IService<SkuFullReductionEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 保存sku满减信息
+     */
+    void saveSkuReduction(List<SkuReductionTO> skuReductionTOs);
 }
 
