@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -147,8 +148,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                         skuImagesEntity.setImgUrl(image.getImgUrl());
                         skuImagesEntity.setDefaultImg(image.getDefaultImg() == 1 ? 1 : 0);
                         return skuImagesEntity;
-                    }).filter(skuImagesEntity -> skuImagesEntity.getImgUrl() != null)
-                    .toList();
+                    }).filter(skuImagesEntity -> StringUtils.isNotBlank(skuImagesEntity.getImgUrl())).toList();
             skuImagesEntities.addAll(skuImagesEntityList);
         }
         //批量保存

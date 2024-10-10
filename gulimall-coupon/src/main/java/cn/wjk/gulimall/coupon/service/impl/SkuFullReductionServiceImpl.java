@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao
                 memberPriceEntity.setMemberPrice(memberPrice.getPrice());
                 memberPriceEntity.setAddOther(1);
                 return memberPriceEntity;
-            }).toList();
+            }).filter(memberPriceEntity -> memberPriceEntity.getMemberPrice().compareTo(BigDecimal.ZERO) > 0).toList();
             memberPriceEntities.addAll(memberPriceEntitiyList);
         }
         memberPriceDao.insert(memberPriceEntities);
@@ -90,7 +91,8 @@ public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao
             //该表的add_other对应skuReduction中的priceStatus
             skuFullReductionEntity.setAddOther(skuReductionTO.getPriceStatus());
             return skuFullReductionEntity;
-        }).toList();
+        }).filter(skuFullReductionEntity -> skuFullReductionEntity.getFullPrice().compareTo(BigDecimal.ZERO) > 0
+                && skuFullReductionEntity.getReducePrice().compareTo(BigDecimal.ZERO) > 0).toList();
         skuFullReductionDao.insert(skuFullReductionEntities);
     }
 
@@ -104,7 +106,8 @@ public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao
             //该表的add_other对应skuReduction中的countStatus
             skuLadderEntity.setAddOther(skuReductionTO.getCountStatus());
             return skuLadderEntity;
-        }).toList();
+        }).filter(skuLadderEntity -> skuLadderEntity.getFullCount() > 0 &&
+                (skuLadderEntity.getDiscount().compareTo(BigDecimal.ZERO) > 0)).toList();
         skuLadderDao.insert(skuLadderEntities);
     }
 }
