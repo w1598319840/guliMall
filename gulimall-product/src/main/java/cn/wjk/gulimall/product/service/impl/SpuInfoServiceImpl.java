@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.service.impl;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.domain.to.SkuReductionTO;
 import cn.wjk.gulimall.common.domain.to.SpuBoundsTO;
 import cn.wjk.gulimall.common.feign.CouponFeign;
@@ -9,9 +10,11 @@ import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.dao.*;
 import cn.wjk.gulimall.product.domain.dto.spuSaveDto.*;
 import cn.wjk.gulimall.product.domain.entity.*;
+import cn.wjk.gulimall.product.domain.vo.SpuInfoVO;
 import cn.wjk.gulimall.product.service.SpuInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -40,6 +40,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private final SkuImagesDao skuImagesDao;
     private final SkuSaleAttrValueDao skuSaleAttrValueDao;
     private final CouponFeign couponFeign;
+    private final BrandDao brandDao;
+    private final CategoryDao categoryDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -76,6 +78,55 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         //5. 保存当前spu对应的所有sku信息
         saveSku(spuSaveDTO);
+    }
+
+    @Override
+    public PageUtils queryPageByCondition(PageDTO pageDTO) {
+        if (pageDTO == null) {
+            return PageUtils.emptyPageUtils();
+        }
+        boolean isAsc = "asc".equalsIgnoreCase(pageDTO.getOrder());
+        Page<SpuInfoEntity> page = new Page<>(pageDTO.getPage(), pageDTO.getLimit());
+        QueryWrapper<SpuInfoEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderBy(StringUtils.isNotEmpty(pageDTO.getSidx()), isAsc, pageDTO.getSidx());
+        String key = pageDTO.getKey();
+        queryWrapper.and(StringUtils.isNotEmpty(key), wrapper ->
+                wrapper.eq("id", key)
+                        .or()
+                        .like("spu_name", key)
+                        .or()
+                        .like("spu_description", key)
+        );
+        Long catelogId = pageDTO.getCatelogId();
+        Long brandId = pageDTO.getBrandId();
+        queryWrapper.eq(catelogId != null && !catelogId.equals(0L), "catalog_id", catelogId);
+        queryWrapper.eq(brandId != null && !brandId.equals(0L), "brand_id", brandId);
+        queryWrapper.eq(pageDTO.getStatus() != null, "publish_status", pageDTO.getStatus());
+        page(page, queryWrapper);
+
+        //将Entity转化为VO
+        List<SpuInfoEntity> spuInfoEntityList = page.getRecords();
+        if (spuInfoEntityList.isEmpty()) {
+            return PageUtils.emptyPageUtils();
+        }
+        Set<Long> brandIds = spuInfoEntityList.stream().map(SpuInfoEntity::getBrandId).collect(Collectors.toSet());
+        Set<Long> catalogIds = spuInfoEntityList.stream().map(SpuInfoEntity::getCatalogId).collect(Collectors.toSet());
+        Map<Long, String> brandIdToBrandNameMap
+                = brandDao.selectBatchIds(brandIds)
+                .stream().collect(Collectors.toMap(BrandEntity::getBrandId, BrandEntity::getName));
+        Map<Long, String> catalogIdToCatalogNameMap
+                = categoryDao.selectBatchIds(catalogIds)
+                .stream().collect(Collectors.toMap(CategoryEntity::getCatId, CategoryEntity::getName));
+
+        List<SpuInfoVO> spuInfoVOList = spuInfoEntityList.stream().map(spuInfoEntity -> {
+            SpuInfoVO spuInfoVO = new SpuInfoVO();
+            BeanUtils.copyProperties(spuInfoEntity, spuInfoVO);
+            spuInfoVO.setBrandName(brandIdToBrandNameMap.get(spuInfoEntity.getBrandId()));
+            spuInfoVO.setCatalogName(catalogIdToCatalogNameMap.get(spuInfoEntity.getCatalogId()));
+            return spuInfoVO;
+        }).toList();
+
+        return new PageUtils(page, spuInfoVOList);
     }
 
     /**
@@ -143,12 +194,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         for (Skus sku : skus) {
             Long skuId = sku.getSkuId();
             List<SkuImagesEntity> skuImagesEntityList = sku.getImages().stream().map(image -> {
-                        SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
-                        skuImagesEntity.setSkuId(skuId);
-                        skuImagesEntity.setImgUrl(image.getImgUrl());
-                        skuImagesEntity.setDefaultImg(image.getDefaultImg() == 1 ? 1 : 0);
-                        return skuImagesEntity;
-                    }).filter(skuImagesEntity -> StringUtils.isNotBlank(skuImagesEntity.getImgUrl())).toList();
+                SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
+                skuImagesEntity.setSkuId(skuId);
+                skuImagesEntity.setImgUrl(image.getImgUrl());
+                skuImagesEntity.setDefaultImg(image.getDefaultImg() == 1 ? 1 : 0);
+                return skuImagesEntity;
+            }).filter(skuImagesEntity -> StringUtils.isNotBlank(skuImagesEntity.getImgUrl())).toList();
             skuImagesEntities.addAll(skuImagesEntityList);
         }
         //批量保存

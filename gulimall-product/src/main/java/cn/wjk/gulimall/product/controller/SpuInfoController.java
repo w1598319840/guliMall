@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.controller;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.dto.spuSaveDto.SpuSaveDTO;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.Map;
 
 
 /**
@@ -26,12 +26,11 @@ public class SpuInfoController {
     private final SpuInfoService spuInfoService;
 
     /**
-     * 列表
+     * 复杂的分页查询
      */
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = spuInfoService.queryPage(params);
-
+    public R list(PageDTO pageDTO) {
+        PageUtils page = spuInfoService.queryPageByCondition(pageDTO);
         return R.ok().put("page", page);
     }
 

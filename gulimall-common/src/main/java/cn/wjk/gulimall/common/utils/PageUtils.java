@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,26 +34,13 @@ public class PageUtils implements Serializable {
         this.list = list;
     }
 
-    /**
-     * 总记录数
-     */
-    private int totalCount;
-    /**
-     * 每页记录数
-     */
-    private int pageSize;
-    /**
-     * 总页数
-     */
-    private int totalPage;
-    /**
-     * 当前页数
-     */
-    private int currPage;
-    /**
-     * 列表数据
-     */
-    private List<?> list;
+    public PageUtils(IPage<?> page, List<?> newList) {
+        this.totalCount = (int) page.getTotal();
+        this.pageSize = (int) page.getSize();
+        this.totalPage = (int) page.getPages();
+        this.currPage = (int) page.getCurrent();
+        this.list = newList;
+    }
 
     /**
      * 分页
@@ -80,4 +68,28 @@ public class PageUtils implements Serializable {
         this.totalPage = (int) page.getPages();
     }
 
+    /**
+     * 总记录数
+     */
+    private int totalCount;
+    /**
+     * 每页记录数
+     */
+    private int pageSize;
+    /**
+     * 总页数
+     */
+    private int totalPage;
+    /**
+     * 当前页数
+     */
+    private int currPage;
+    /**
+     * 列表数据
+     */
+    private List<?> list;
+
+    public static PageUtils emptyPageUtils() {
+        return new PageUtils(0, 10, 0, 1, Collections.emptyList());
+    }
 }

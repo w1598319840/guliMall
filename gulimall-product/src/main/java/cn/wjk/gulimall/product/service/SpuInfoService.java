@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.service;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.product.domain.dto.spuSaveDto.SpuSaveDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -19,5 +20,10 @@ public interface SpuInfoService extends IService<SpuInfoEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     void saveSpuInfo(SpuSaveDTO spuSaveDTO);
+
+    /**
+     * 复杂的分页查询
+     */
+    PageUtils queryPageByCondition(PageDTO pageDTO);
 }
 

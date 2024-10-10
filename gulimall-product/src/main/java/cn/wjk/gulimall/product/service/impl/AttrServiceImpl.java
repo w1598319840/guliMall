@@ -138,7 +138,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             return attrVO;
         }).toList();
 
-        return new PageUtils(page.getTotal(), page.getSize(), page.getPages(), page.getCurrent(), attrVOs);
+        return new PageUtils(page, attrVOs);
     }
 
     @Override
@@ -254,7 +254,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         List<Long> attrIds = allAttrIdList.stream().filter(attrId -> !relatedAttrIdList.contains(attrId)).toList();
         if (attrIds.isEmpty()) {
             //当前分类下已经没有没有被关联过的属性了
-            return new PageUtils(0, 10, 0, 1, Collections.emptyList());
+            return PageUtils.emptyPageUtils();
         }
         queryWrapper.in("attr_id", attrIds);
         //5.2. 要是基本属性

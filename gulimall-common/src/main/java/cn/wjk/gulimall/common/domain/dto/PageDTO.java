@@ -32,4 +32,16 @@ public class PageDTO {
      * 检索关键字
      */
     private String key;
+    /**
+     * 三级分类id
+     */
+    private Long catelogId;
+    /**
+     * 品牌id
+     */
+    private Long brandId;
+    /**
+     * 商品状态
+     */
+    private Integer status;
 }
