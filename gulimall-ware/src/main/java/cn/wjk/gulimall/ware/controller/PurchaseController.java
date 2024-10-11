@@ -2,12 +2,14 @@ package cn.wjk.gulimall.ware.controller;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
-import cn.wjk.gulimall.ware.entity.PurchaseEntity;
+import cn.wjk.gulimall.ware.domain.dto.WareMergeDTO;
+import cn.wjk.gulimall.ware.domain.entity.PurchaseEntity;
 import cn.wjk.gulimall.ware.service.PurchaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -60,10 +62,10 @@ public class PurchaseController {
      * 保存
      */
     @RequestMapping("/save")
-    //@RequiresPermissions("ware:purchase:save")
     public R save(@RequestBody PurchaseEntity purchase) {
+        purchase.setCreateTime(new Date());
+        purchase.setUpdateTime(new Date());
         purchaseService.save(purchase);
-
         return R.ok();
     }
 
@@ -73,8 +75,8 @@ public class PurchaseController {
     @RequestMapping("/update")
     //@RequiresPermissions("ware:purchase:update")
     public R update(@RequestBody PurchaseEntity purchase) {
+        purchase.setUpdateTime(new Date());
         purchaseService.updateById(purchase);
-
         return R.ok();
     }
 
@@ -89,4 +91,12 @@ public class PurchaseController {
         return R.ok();
     }
 
+    /**
+     * 合并采购单
+     */
+    @PostMapping("merge")
+    public R merge(@RequestBody WareMergeDTO wareMergeDTO) {
+        purchaseService.merge(wareMergeDTO);
+        return R.ok();
+    }
 }

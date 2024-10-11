@@ -3,7 +3,7 @@ package cn.wjk.gulimall.ware.controller;
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
-import cn.wjk.gulimall.ware.entity.PurchaseDetailEntity;
+import cn.wjk.gulimall.ware.domain.entity.PurchaseDetailEntity;
 import cn.wjk.gulimall.ware.service.PurchaseDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

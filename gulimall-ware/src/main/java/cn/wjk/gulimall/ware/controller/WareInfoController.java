@@ -3,7 +3,7 @@ package cn.wjk.gulimall.ware.controller;
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
-import cn.wjk.gulimall.ware.entity.WareInfoEntity;
+import cn.wjk.gulimall.ware.domain.entity.WareInfoEntity;
 import cn.wjk.gulimall.ware.service.WareInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

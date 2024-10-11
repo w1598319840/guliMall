@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.wjk.gulimall.ware.entity.WareOrderTaskEntity;
+import cn.wjk.gulimall.ware.domain.entity.WareOrderTaskEntity;
 import cn.wjk.gulimall.ware.service.WareOrderTaskService;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;

@@ -9,7 +9,7 @@ import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 
 import cn.wjk.gulimall.ware.dao.WareOrderTaskDao;
-import cn.wjk.gulimall.ware.entity.WareOrderTaskEntity;
+import cn.wjk.gulimall.ware.domain.entity.WareOrderTaskEntity;
 import cn.wjk.gulimall.ware.service.WareOrderTaskService;
 
 
@@ -20,7 +20,7 @@ public class WareOrderTaskServiceImpl extends ServiceImpl<WareOrderTaskDao, Ware
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<WareOrderTaskEntity> page = this.page(
                 new Query<WareOrderTaskEntity>().getPage(params),
-                new QueryWrapper<WareOrderTaskEntity>()
+                new QueryWrapper<>()
         );
 
         return new PageUtils(page);

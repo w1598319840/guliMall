@@ -9,7 +9,7 @@ import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 
 import cn.wjk.gulimall.ware.dao.UndoLogDao;
-import cn.wjk.gulimall.ware.entity.UndoLogEntity;
+import cn.wjk.gulimall.ware.domain.entity.UndoLogEntity;
 import cn.wjk.gulimall.ware.service.UndoLogService;
 
 
@@ -20,7 +20,7 @@ public class UndoLogServiceImpl extends ServiceImpl<UndoLogDao, UndoLogEntity> i
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<UndoLogEntity> page = this.page(
                 new Query<UndoLogEntity>().getPage(params),
-                new QueryWrapper<UndoLogEntity>()
+                new QueryWrapper<>()
         );
 
         return new PageUtils(page);

@@ -1,52 +1,62 @@
-package cn.wjk.gulimall.ware.entity;
+package cn.wjk.gulimall.ware.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
 /**
- * 库存工作单
+ * 
  * 
  * @author wenjiakai
  * @email 1598319840@qq.com
  * @date 2024-10-04 14:00:15
  */
 @Data
-@TableName("wms_ware_order_task_detail")
-public class WareOrderTaskDetailEntity implements Serializable {
+@TableName("undo_log")
+public class UndoLogEntity implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * id
+	 * 
 	 */
 	@TableId
 	private Long id;
 	/**
-	 * sku_id
+	 * 
 	 */
-	private Long skuId;
+	private Long branchId;
 	/**
-	 * sku_name
+	 * 
 	 */
-	private String skuName;
+	private String xid;
 	/**
-	 * 购买个数
+	 * 
 	 */
-	private Integer skuNum;
+	private String context;
 	/**
-	 * 工作单id
+	 * 
 	 */
-	private Long taskId;
+	private byte[] rollbackInfo;
 	/**
-	 * 仓库id
+	 * 
 	 */
-	private Long wareId;
+	private Integer logStatus;
 	/**
-	 * 1-已锁定  2-已解锁  3-扣减
+	 * 
 	 */
-	private Integer lockStatus;
+	private Date logCreated;
+	/**
+	 * 
+	 */
+	private Date logModified;
+	/**
+	 * 
+	 */
+	private String ext;
 
 }

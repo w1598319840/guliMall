@@ -1,4 +1,4 @@
-package cn.wjk.gulimall.ware.entity;
+package cn.wjk.gulimall.ware.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
