@@ -54,4 +54,12 @@ public class PageDTO {
      * 最高价格
      */
     private BigDecimal max;
+    /**
+     * 仓库id
+     */
+    private Long wareId;
+    /**
+     * 商品id
+     */
+    private Long skuId;
 }
