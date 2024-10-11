@@ -21,8 +21,12 @@ spring:
             - Path=/api/product/**
           filters:
             - StripPrefix=1 #去掉一级路径
-#        - id: gulimall-ware
-#          uri: lb://gulimall-ware
+        - id: gulimall-ware
+          uri: lb://gulimall-ware
+          predicates:
+            - Path=/api/ware/**
+          filters:
+            - StripPrefix=1
         - id: gulimall-thirdParty
           uri: lb://gulimall-thirdParty
           predicates:
