@@ -1,6 +1,11 @@
 package cn.wjk.gulimall.common.feign;
 
+import cn.wjk.gulimall.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * @Package: cn.wjk.gulimall.common.feign
@@ -12,4 +17,6 @@ import org.springframework.cloud.openfeign.FeignClient;
  */
 @FeignClient("gulimall-product")
 public interface ProductFeign {
+    @GetMapping("/product/skuinfo//info/skuName")
+    R getSkuNamesBySkuIds(@RequestParam("skuIds") List<Long> skuIds);
 }

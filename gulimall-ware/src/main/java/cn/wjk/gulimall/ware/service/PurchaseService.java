@@ -1,6 +1,7 @@
 package cn.wjk.gulimall.ware.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
+import cn.wjk.gulimall.ware.domain.dto.PurchaseDoneDTO;
 import cn.wjk.gulimall.ware.domain.dto.WareMergeDTO;
 import cn.wjk.gulimall.ware.domain.entity.PurchaseEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -33,5 +34,10 @@ public interface PurchaseService extends IService<PurchaseEntity> {
      * 员工接收已分配的采购单
      */
     void receivePurchase(List<Long> ids);
+
+    /**
+     * 采购完成
+     */
+    void purchaseDone(PurchaseDoneDTO purchaseDoneDTO);
 }
 

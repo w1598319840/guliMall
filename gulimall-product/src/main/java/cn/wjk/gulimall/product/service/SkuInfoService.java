@@ -2,9 +2,10 @@ package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
-import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.product.domain.entity.SkuInfoEntity;
+import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,5 +23,10 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
      * 分页查询sku
      */
     PageUtils pageQuerySku(PageDTO pageDTO);
+
+    /**
+     * 根据sku的id获取sku的name
+     */
+    Map<Long, String> getSkuNamesBySkuIds(List<Long> skuIds);
 }
 

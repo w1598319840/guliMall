@@ -14,7 +14,9 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service("skuInfoService")
@@ -66,4 +68,10 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         return new PageUtils(page);
     }
 
+    @Override
+    public Map<Long, String> getSkuNamesBySkuIds(List<Long> skuIds) {
+        return this.listByIds(skuIds).stream().collect(Collectors.toMap(
+                SkuInfoEntity::getSkuId, SkuInfoEntity::getSkuName
+        ));
+    }
 }

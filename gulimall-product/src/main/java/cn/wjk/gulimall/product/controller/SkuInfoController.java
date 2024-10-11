@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -74,4 +76,9 @@ public class SkuInfoController {
         return R.ok();
     }
 
+    @GetMapping("/info/skuName")
+    public R getSkuNamesBySkuIds(@RequestParam List<Long> skuIds) {
+        Map<Long, String> map = skuInfoService.getSkuNamesBySkuIds(skuIds);
+        return R.ok().put("data", map);
+    }
 }

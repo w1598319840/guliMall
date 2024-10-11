@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BIZException.class)
     public R handleBIZException(BIZException e) {
         log.error(e.getMessage(), e);
-        BizHttpStatusEnum illegalParameters = BizHttpStatusEnum.ILLEGAL_PARAMETERS;
-        return R.error(illegalParameters.getCode(), illegalParameters.getDesc());
+        BizHttpStatusEnum bizHttpStatus = e.getBizHttpStatusEnum();
+        return R.error(bizHttpStatus.getCode(), bizHttpStatus.getDesc());
     }
 }

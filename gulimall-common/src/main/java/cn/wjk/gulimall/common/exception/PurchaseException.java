@@ -1,5 +1,7 @@
 package cn.wjk.gulimall.common.exception;
 
+import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+
 /**
  * @Package: cn.wjk.gulimall.common.exception
  * @ClassName: PurchaseException
@@ -9,7 +11,7 @@ package cn.wjk.gulimall.common.exception;
  * @Description:
  */
 public class PurchaseException extends BIZException {
-    public PurchaseException(String message) {
-        super(message);
+    public PurchaseException(BizHttpStatusEnum bizHttpStatusEnum) {
+        super(bizHttpStatusEnum);
     }
 }

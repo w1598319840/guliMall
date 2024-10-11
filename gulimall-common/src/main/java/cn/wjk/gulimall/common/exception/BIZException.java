@@ -1,5 +1,9 @@
 package cn.wjk.gulimall.common.exception;
 
+import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 /**
  * @Package: cn.wjk.gulimall.common.exception
  * @ClassName: BIZException
@@ -8,8 +12,12 @@ package cn.wjk.gulimall.common.exception;
  * @Datetime: 2024/10/11 下午4:56
  * @Description: 有关业务的异常
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class BIZException extends RuntimeException {
-    public BIZException(String message) {
-        super(message);
+    BizHttpStatusEnum bizHttpStatusEnum;
+
+    public BIZException(BizHttpStatusEnum bizHttpStatusEnum) {
+        this.bizHttpStatusEnum = bizHttpStatusEnum;
     }
 }

@@ -13,17 +13,22 @@ import lombok.Getter;
  *               该枚举类用于定义业务中出现的各种情况对应的状态码以及描述信息
  *               状态码的组成是这样的: 前两位表示状态码类型，后三位表示具体状态码信息
  *               10: 通用
- *               11: 商品模块
- *               12: 订单模块
- *               13: 购物车模块
- *               14: 物流模块
+ *               11: 优惠券模块
+ *               12: 会员模块
+ *               13: 订单模块
+ *               14: 商品模块
+ *               15: 仓储模块
  */
 @AllArgsConstructor
 @Getter
 public enum BizHttpStatusEnum {
     UNKNOWN_EXCEPTION(10000, "系统未知异常"),
     VALID_EXCEPTION(10001, "参数格式校验失败"),
-    ILLEGAL_PARAMETERS(10002, "传入的参数有误");
+    ILLEGAL_PARAMETERS_EXCEPTION(10002, "传入的参数不合法"),
+    RPC_EXCEPTION(10003, "远程调用服务失败"),
+    RPC_DATA_EXCEPTION(10004, "远程获取数据失败"),
+    MERGE_EXCEPTION(15001, "仅能合并新建、已分配状态的采购需求"),
+    PURCHASE_STATUS_EXCEPTION(15002, "采购单状态异常");
 
     private final int code;
     private final String desc;

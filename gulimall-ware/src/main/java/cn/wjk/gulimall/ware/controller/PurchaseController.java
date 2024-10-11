@@ -2,6 +2,7 @@ package cn.wjk.gulimall.ware.controller;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
+import cn.wjk.gulimall.ware.domain.dto.PurchaseDoneDTO;
 import cn.wjk.gulimall.ware.domain.dto.WareMergeDTO;
 import cn.wjk.gulimall.ware.domain.entity.PurchaseEntity;
 import cn.wjk.gulimall.ware.service.PurchaseService;
@@ -103,6 +104,15 @@ public class PurchaseController {
     @PostMapping("/received")
     public R receivePurchase(@RequestBody List<Long> ids) {
         purchaseService.receivePurchase(ids);
+        return R.ok();
+    }
+
+    /**
+     * 完成采购
+     */
+    @PostMapping("/done")
+    public R purchaseDone(@RequestBody PurchaseDoneDTO purchaseDoneDTO) {
+        purchaseService.purchaseDone(purchaseDoneDTO);
         return R.ok();
     }
 }
