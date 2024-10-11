@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.ware.service;
 
+import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.ware.entity.PurchaseDetailEntity;
@@ -16,5 +17,10 @@ import java.util.Map;
 public interface PurchaseDetailService extends IService<PurchaseDetailEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 查询采购需求
+     */
+    PageUtils pageQueryDetail(PageDTO pageDTO);
 }
 
