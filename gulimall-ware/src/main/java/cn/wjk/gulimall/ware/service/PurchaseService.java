@@ -5,6 +5,7 @@ import cn.wjk.gulimall.ware.domain.dto.WareMergeDTO;
 import cn.wjk.gulimall.ware.domain.entity.PurchaseEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,5 +28,10 @@ public interface PurchaseService extends IService<PurchaseEntity> {
      * 合并采购单
      */
     void merge(WareMergeDTO wareMergeDTO);
+
+    /**
+     * 员工接收已分配的采购单
+     */
+    void receivePurchase(List<Long> ids);
 }
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -30,7 +31,6 @@ public class PurchaseController {
      * 列表
      */
     @RequestMapping("/list")
-    //@RequiresPermissions("ware:purchase:list")
     public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = purchaseService.queryPage(params);
 
@@ -46,12 +46,10 @@ public class PurchaseController {
         return R.ok().put("page", pageUtils);
     }
 
-
     /**
      * 信息
      */
     @RequestMapping("/info/{id}")
-    //@RequiresPermissions("ware:purchase:info")
     public R info(@PathVariable("id") Long id) {
         PurchaseEntity purchase = purchaseService.getById(id);
 
@@ -73,7 +71,6 @@ public class PurchaseController {
      * 修改
      */
     @RequestMapping("/update")
-    //@RequiresPermissions("ware:purchase:update")
     public R update(@RequestBody PurchaseEntity purchase) {
         purchase.setUpdateTime(new Date());
         purchaseService.updateById(purchase);
@@ -84,7 +81,6 @@ public class PurchaseController {
      * 删除
      */
     @RequestMapping("/delete")
-    //@RequiresPermissions("ware:purchase:delete")
     public R delete(@RequestBody Long[] ids) {
         purchaseService.removeByIds(Arrays.asList(ids));
 
@@ -94,9 +90,19 @@ public class PurchaseController {
     /**
      * 合并采购单
      */
-    @PostMapping("merge")
+    @PostMapping("/merge")
     public R merge(@RequestBody WareMergeDTO wareMergeDTO) {
         purchaseService.merge(wareMergeDTO);
+        return R.ok();
+    }
+
+    /**
+     * 员工接收已分配的采购单
+     * @param ids purchase的id
+     */
+    @PostMapping("/received")
+    public R receivePurchase(@RequestBody List<Long> ids) {
+        purchaseService.receivePurchase(ids);
         return R.ok();
     }
 }

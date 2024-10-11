@@ -12,6 +12,9 @@ import lombok.Getter;
  * @Description: 库存服务的常量类
  */
 public class WareConstant {
+    /**
+     * 采购单的状态
+     */
     @AllArgsConstructor
     @Getter
     public enum PurchaseStatus {
@@ -25,6 +28,9 @@ public class WareConstant {
         private final String desc;
     }
 
+    /**
+     * 采购单需求的状态
+     */
     @AllArgsConstructor
     @Getter
     public enum PurchaseDetailStatus {
