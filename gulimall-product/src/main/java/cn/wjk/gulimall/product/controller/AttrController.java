@@ -4,6 +4,7 @@ import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
+import cn.wjk.gulimall.product.domain.dto.UpdateSpuAttrDTO;
 import cn.wjk.gulimall.product.domain.entity.ProductAttrValueEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import cn.wjk.gulimall.product.service.AttrService;
@@ -97,5 +98,14 @@ public class AttrController {
     public R listForSpu(@PathVariable("spuId") Long spuId) {
         List<ProductAttrValueEntity> data = productAttrValueService.listForSpu(spuId);
         return R.ok().put("data", data);
+    }
+
+    /**
+     * 修改商品规格
+     */
+    @PostMapping("/update/{spuId}")
+    public R updateSpuAttr(@PathVariable("spuId") Long spuId, @RequestBody List<UpdateSpuAttrDTO> updateSpuAttrs) {
+        productAttrValueService.updateSpuAttr(spuId, updateSpuAttrs);
+        return R.ok();
     }
 }

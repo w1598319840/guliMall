@@ -1,6 +1,7 @@
 package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
+import cn.wjk.gulimall.product.domain.dto.UpdateSpuAttrDTO;
 import cn.wjk.gulimall.product.domain.entity.ProductAttrValueEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -22,6 +23,11 @@ public interface ProductAttrValueService extends IService<ProductAttrValueEntity
      * 获取spu规格信息
      */
     List<ProductAttrValueEntity> listForSpu(Long spuId);
+
+    /**
+     * 修改商品规格
+     */
+    void updateSpuAttr(Long spuId, List<UpdateSpuAttrDTO> updateSpuAttrs);
 }
 
 
