@@ -4,12 +4,15 @@ import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
+import cn.wjk.gulimall.product.domain.entity.ProductAttrValueEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import cn.wjk.gulimall.product.service.AttrService;
+import cn.wjk.gulimall.product.service.ProductAttrValueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -21,10 +24,11 @@ import java.util.Map;
  * @date 2024-10-03 20:19:51
  */
 @RestController
-@RequestMapping("product/attr")
+@RequestMapping("/product/attr")
 @RequiredArgsConstructor
 public class AttrController {
     private final AttrService attrService;
+    private final ProductAttrValueService productAttrValueService;
 
     /**
      * 列表
@@ -84,5 +88,14 @@ public class AttrController {
     public R delete(@RequestBody Long[] attrIds) {
         attrService.removeCascadeByIds(Arrays.asList(attrIds));
         return R.ok();
+    }
+
+    /**
+     * 获取spu的规格信息
+     */
+    @GetMapping("/base/listforspu/{spuId}")
+    public R listForSpu(@PathVariable("spuId") Long spuId) {
+        List<ProductAttrValueEntity> data = productAttrValueService.listForSpu(spuId);
+        return R.ok().put("data", data);
     }
 }

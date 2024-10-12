@@ -1,9 +1,10 @@
 package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
-import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.product.domain.entity.ProductAttrValueEntity;
+import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,11 @@ import java.util.Map;
 public interface ProductAttrValueService extends IService<ProductAttrValueEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取spu规格信息
+     */
+    List<ProductAttrValueEntity> listForSpu(Long spuId);
 }
+
 
