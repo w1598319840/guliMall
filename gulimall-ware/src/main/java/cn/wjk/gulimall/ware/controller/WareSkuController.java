@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -19,7 +21,7 @@ import java.util.Arrays;
  * @date 2024-10-04 14:00:15
  */
 @RestController
-@RequestMapping("ware/waresku")
+@RequestMapping("/ware/waresku")
 @RequiredArgsConstructor
 public class WareSkuController {
     private final WareSkuService wareSkuService;
@@ -47,7 +49,6 @@ public class WareSkuController {
      * 保存
      */
     @RequestMapping("/save")
-    //@RequiresPermissions("ware:waresku:save")
     public R save(@RequestBody WareSkuEntity wareSku) {
         wareSkuService.save(wareSku);
 
@@ -58,7 +59,6 @@ public class WareSkuController {
      * 修改
      */
     @RequestMapping("/update")
-    //@RequiresPermissions("ware:waresku:update")
     public R update(@RequestBody WareSkuEntity wareSku) {
         wareSkuService.updateById(wareSku);
 
@@ -72,8 +72,15 @@ public class WareSkuController {
     //@RequiresPermissions("ware:waresku:delete")
     public R delete(@RequestBody Long[] ids) {
         wareSkuService.removeByIds(Arrays.asList(ids));
-
         return R.ok();
     }
 
+    /**
+     * 获取sku的库存
+     */
+    @GetMapping("/stock")
+    public R getSkuStock(@RequestParam("skuIds") List<Long> skuIds) {
+        Map<Long, Long> data = wareSkuService.getSkuStock(skuIds);
+        return R.ok().put("data", data);
+    }
 }

@@ -26,7 +26,8 @@ public enum BizHttpStatusEnum {
     VALID_EXCEPTION(10001, "参数格式校验失败"),
     ILLEGAL_PARAMETERS_EXCEPTION(10002, "传入的参数不合法"),
     RPC_EXCEPTION(10003, "远程调用服务失败"),
-    RPC_DATA_EXCEPTION(10004, "远程获取数据失败"),
+    RPC_DATA_EXCEPTION(10004, "远程获取数据与预期数据类型不符"),
+    PRODUCT_UP_EXCEPTION(14001, "商品上架失败"),
     MERGE_EXCEPTION(15001, "仅能合并新建、已分配状态的采购需求"),
     PURCHASE_STATUS_EXCEPTION(15002, "采购单状态异常");
 

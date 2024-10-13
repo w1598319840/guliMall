@@ -13,6 +13,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -46,5 +48,24 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         this.page(page, queryWrapper);
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public Map<Long, Long> getSkuStock(List<Long> skuIds) {
+        if (skuIds == null || skuIds.isEmpty()) {
+            return Map.of();
+        }
+        List<WareSkuEntity> wareSkuEntities = this.list(new QueryWrapper<WareSkuEntity>().in("sku_id", skuIds));
+        HashMap<Long, Long> skuIdToStockMap = new HashMap<>();
+        //先将所有sku的库存都设为0
+        for (Long skuId : skuIds) {
+            skuIdToStockMap.put(skuId, 0L);
+        }
+        for (WareSkuEntity wareSkuEntity : wareSkuEntities) {
+            Long skuId = wareSkuEntity.getSkuId();
+            int availableStock = wareSkuEntity.getStock() - wareSkuEntity.getStockLocked();
+            skuIdToStockMap.put(skuId, skuIdToStockMap.get(skuId) + availableStock);
+        }
+        return skuIdToStockMap;
     }
 }

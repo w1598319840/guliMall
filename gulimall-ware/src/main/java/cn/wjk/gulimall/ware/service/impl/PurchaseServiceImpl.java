@@ -191,11 +191,11 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
         List<Long> skuIds = purchaseDetailEntities.stream().map(PurchaseDetailEntity::getSkuId).toList();
         R result = productFeign.getSkuNamesBySkuIds(skuIds);
         if (result.getCode() != 0) {
-            throw new RPCException();
+            throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
         }
         Object data = result.get("data");
         if (!(data instanceof Map<?, ?>)) {
-            throw new PurchaseException(BizHttpStatusEnum.RPC_DATA_EXCEPTION);
+            throw new RPCException(BizHttpStatusEnum.RPC_DATA_EXCEPTION);
         }
         //经过网络流后，HashMap -> LinkedHashMap, 最重要的是，其中Long类型的key变成了String类型，
         //如果直接转换为Map<Long, String>，那么实际上的key的类型就会变成byte，真是头疼
@@ -246,6 +246,7 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
         wareSkuDao.insert(wareSkuEntitiesInsert);
 
         //update(暂时想不出能够不使用循环的方式进行更新)
+        //可以选择先删后增来避免循环更新
         for (PurchaseDetailEntity detailEntity : updates) {
             WareSkuEntity wareSkuEntity = new WareSkuEntity();
             wareSkuEntity.setSkuId(detailEntity.getSkuId());

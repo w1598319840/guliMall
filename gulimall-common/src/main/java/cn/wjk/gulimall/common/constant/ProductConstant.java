@@ -20,4 +20,14 @@ public interface ProductConstant {
         private final String type;
         private final int code;
     }
+
+    @AllArgsConstructor
+    @Getter
+    enum SpuStatus {
+        NEW(0, "新建"),
+        UP(1, "上架"),
+        DOWN(2, "下架");
+        private final int code;
+        private final String desc;
+    }
 }

@@ -1,0 +1,4 @@
+gulimall:
+  elasticsearch:
+    host: 172.30.60.231
+    port: 9200

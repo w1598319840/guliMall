@@ -1,10 +1,11 @@
 package cn.wjk.gulimall.ware.service;
 
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
-import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.ware.domain.entity.WareSkuEntity;
+import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,5 +23,10 @@ public interface WareSkuService extends IService<WareSkuEntity> {
      * 分页查询
      */
     PageUtils pageQueryDetail(PageDTO pageDTO);
+
+    /**
+     * 获取sku库存数量
+     */
+    Map<Long, Long> getSkuStock(List<Long> skuIds);
 }
 

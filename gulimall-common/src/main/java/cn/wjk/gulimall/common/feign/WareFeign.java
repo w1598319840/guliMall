@@ -1,6 +1,11 @@
 package cn.wjk.gulimall.common.feign;
 
+import cn.wjk.gulimall.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * @Package: cn.wjk.gulimall.common.feign
@@ -12,4 +17,9 @@ import org.springframework.cloud.openfeign.FeignClient;
  */
 @FeignClient("gulimall-ware")
 public interface WareFeign {
+    /**
+     * 获取sku的库存数量
+     */
+    @GetMapping("/ware/waresku/stock")
+    R getSkuStock(@RequestParam("skuIds") List<Long> skuIds);
 }

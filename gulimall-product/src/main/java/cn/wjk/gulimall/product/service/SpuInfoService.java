@@ -25,5 +25,10 @@ public interface SpuInfoService extends IService<SpuInfoEntity> {
      * 复杂的分页查询
      */
     PageUtils queryPageByCondition(PageDTO pageDTO);
+
+    /**
+     * 商品上架
+     */
+    void up(Long spuId);
 }
 

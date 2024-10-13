@@ -71,4 +71,13 @@ public class SpuInfoController {
         spuInfoService.removeByIds(Arrays.asList(ids));
         return R.ok();
     }
+
+    /**
+     * 商品上架
+     */
+    @PostMapping("/{spuId}/up")
+    public R up(@PathVariable Long spuId) {
+        spuInfoService.up(spuId);
+        return R.ok();
+    }
 }

@@ -11,7 +11,7 @@ import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
  * @Description:
  */
 public class RPCException extends BIZException {
-    public RPCException() {
-        super(BizHttpStatusEnum.RPC_EXCEPTION);
+    public RPCException(BizHttpStatusEnum bizHttpStatusEnum) {
+        super(bizHttpStatusEnum);
     }
 }

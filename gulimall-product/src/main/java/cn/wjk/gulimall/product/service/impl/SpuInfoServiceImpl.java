@@ -1,9 +1,16 @@
 package cn.wjk.gulimall.product.service.impl;
 
+import cn.wjk.gulimall.common.constant.ProductConstant;
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.domain.to.SkuReductionTO;
 import cn.wjk.gulimall.common.domain.to.SpuBoundsTO;
+import cn.wjk.gulimall.common.domain.to.es.AttrEsModel;
+import cn.wjk.gulimall.common.domain.to.es.SkuEsModel;
+import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+import cn.wjk.gulimall.common.exception.RPCException;
 import cn.wjk.gulimall.common.feign.CouponFeign;
+import cn.wjk.gulimall.common.feign.SearchFeign;
+import cn.wjk.gulimall.common.feign.WareFeign;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 import cn.wjk.gulimall.common.utils.R;
@@ -39,9 +46,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private final SkuInfoDao skuInfoDao;
     private final SkuImagesDao skuImagesDao;
     private final SkuSaleAttrValueDao skuSaleAttrValueDao;
-    private final CouponFeign couponFeign;
     private final BrandDao brandDao;
     private final CategoryDao categoryDao;
+    private final CouponFeign couponFeign;
+    private final WareFeign wareFeign;
+    private final SearchFeign searchFeign;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -127,6 +136,118 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }).toList();
 
         return new PageUtils(page, spuInfoVOList);
+    }
+
+    @Override
+    public void up(Long spuId) {
+        //1. 封装数据
+        //sku_info表
+        List<SkuInfoEntity> skuInfoEntities
+                = skuInfoDao.selectList(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
+        List<Long> skuIds = skuInfoEntities.stream().map(SkuInfoEntity::getSkuId).toList();
+
+        //brand表
+        Map<Long, Long> skuIdToBrandIdMap = skuInfoEntities.stream().collect(Collectors.toMap(
+                SkuInfoEntity::getSkuId,
+                SkuInfoEntity::getBrandId));
+        Map<Long, BrandEntity> brandIdToBrandEntityMap =
+                brandDao.selectBatchIds(skuIdToBrandIdMap.values().stream().distinct().toList())
+                        .stream().collect(Collectors.toMap(BrandEntity::getBrandId, brandEntity -> brandEntity));
+
+        //category表
+        Map<Long, Long> skuIdToCategoryIdMap = skuInfoEntities.stream().collect(Collectors.toMap(
+                SkuInfoEntity::getSkuId,
+                SkuInfoEntity::getCatalogId
+        ));
+        Map<Long, CategoryEntity> categoryIdToCategoryEntityMap =
+                categoryDao.selectBatchIds(skuIdToCategoryIdMap.values().stream().distinct().toList())
+                        .stream().collect(Collectors.toMap(CategoryEntity::getCatId, categoryEntity -> categoryEntity));
+
+        //attrs，并且要是能够检索的(数据库表中有字段标识了是否能够被检索)
+        //实际上同一个spu下的sku的attr应该是一样的
+        //我的表中数据不一样纯是因为当时插入数据时前端页面有BUG，我无法使用，因此直接使用http client插入了一些不符合标准的测试数据
+        Map<Long, ProductAttrValueEntity> attrIdToProductAttrValueEntityMap =
+                productAttrValueDao.selectList(new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId))
+                        .stream().collect(Collectors.toMap(ProductAttrValueEntity::getAttrId, p -> p));
+        List<Long> searchAttrIds = attrDao.selectList(new QueryWrapper<AttrEntity>()
+                        .in("attr_id", attrIdToProductAttrValueEntityMap.keySet()))
+                .stream().filter(attrEntity -> attrEntity.getSearchType().equals(1))
+                .map(AttrEntity::getAttrId).toList();
+        List<AttrEsModel> attrs = searchAttrIds.stream().map(searchAttrId -> {
+            ProductAttrValueEntity productAttrValueEntity = attrIdToProductAttrValueEntityMap.get(searchAttrId);
+            AttrEsModel attrEsModel = new AttrEsModel();
+            BeanUtils.copyProperties(productAttrValueEntity, attrEsModel);
+            return attrEsModel;
+        }).toList();
+//        Map<Long, List<SkuSaleAttrValueEntity>> skuIdToSkuSaleAttrValueEntitiesMap =
+//                skuSaleAttrValueDao.selectList(new QueryWrapper<SkuSaleAttrValueEntity>().in("sku_id", skuIds))
+//                        .stream().collect(Collectors.groupingBy(SkuSaleAttrValueEntity::getSkuId));
+
+        //远程调用来获取sku的库存数量
+        R result = wareFeign.getSkuStock(skuIds);
+        Object o = result.get("data");
+        if (result.getCode() != 0) {
+            throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
+        }
+        Object data = result.get("data");
+        if (!(data instanceof Map<?, ?>)) {
+            throw new RPCException(BizHttpStatusEnum.RPC_DATA_EXCEPTION);
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> skuIdToStockMapRaw = (Map<String, Integer>) o;
+        Map<Long, Long> skuIdToStockMap = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : skuIdToStockMapRaw.entrySet()) {
+            //将byte、int -> long
+            String key = entry.getKey();
+            long value = entry.getValue();
+            skuIdToStockMap.put(Long.valueOf(key), value);
+        }
+
+        //广快封装
+        List<SkuEsModel> skuEsModels = skuInfoEntities.stream().map(skuInfo -> {
+            Long skuId = skuInfo.getSkuId();
+            Long brandId = skuIdToBrandIdMap.get(skuId);
+            BrandEntity brandEntity = brandIdToBrandEntityMap.get(brandId);
+            Long categoryId = skuIdToCategoryIdMap.get(skuId);
+            CategoryEntity categoryEntity = categoryIdToCategoryEntityMap.get(categoryId);
+//            List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = skuIdToSkuSaleAttrValueEntitiesMap.get(skuId);
+//            List<AttrEsModel> attrs = skuSaleAttrValueEntities.stream().map(skuSaleAttrValue -> {
+//                AttrEsModel attrEsModel = new AttrEsModel();
+//                attrEsModel.setAttrId(skuSaleAttrValue.getAttrId());
+//                attrEsModel.setAttrName(skuSaleAttrValue.getAttrName());
+//                attrEsModel.setAttrValue(skuSaleAttrValue.getAttrValue());
+//                return attrEsModel;
+//            }).toList();
+            SkuEsModel skuEsModel = new SkuEsModel();
+            skuEsModel.setSkuId(skuId);
+            skuEsModel.setSpuId(spuId);
+            skuEsModel.setSkuTitle(skuInfo.getSkuTitle());
+            skuEsModel.setSkuPrice(skuInfo.getPrice());
+            skuEsModel.setSkuImg(skuInfo.getSkuDefaultImg());
+            skuEsModel.setSaleCount(skuInfo.getSaleCount());
+            skuEsModel.setHasStock(!skuIdToStockMap.get(skuId).equals(0L));//是否有库存
+            skuEsModel.setHotScore(0L);//热点点数，现在刚上架赋为0，实际场景中会有各种操作，加钱热度就高
+            skuEsModel.setBrandId(brandId);
+            skuEsModel.setBrandName(brandEntity.getName());
+            skuEsModel.setBrandImg(brandEntity.getLogo());
+            skuEsModel.setCatalogId(categoryId);
+            skuEsModel.setCatalogName(categoryEntity.getName());
+            skuEsModel.setAttrs(attrs);
+            return skuEsModel;
+        }).toList();
+
+        //2. 远程调用，将商品数据插入ES中
+        R upResult = searchFeign.up(skuEsModels);
+        if (upResult.getCode() != 0) {
+            throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
+        }
+
+        //3. 修改商品的当前状态
+        this.lambdaUpdate()
+                .set(SpuInfoEntity::getPublishStatus, ProductConstant.SpuStatus.UP.getCode())
+                .set(SpuInfoEntity::getUpdateTime, new Date())
+                .eq(SpuInfoEntity::getId, spuId)
+                .update();
     }
 
     /**
