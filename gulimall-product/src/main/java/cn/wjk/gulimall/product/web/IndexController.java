@@ -27,7 +27,7 @@ public class IndexController {
 
     @GetMapping({"/index", "/"})
     public ModelAndView index(ModelAndView modelAndView) {
-        //查询出所有的一级分类
+        //查出所有的一级分类
         List<CategoryEntity> categoryEntities = categoryService.getAllRootCategories();
         modelAndView.setViewName("index");
         modelAndView.addObject("categories", categoryEntities);
