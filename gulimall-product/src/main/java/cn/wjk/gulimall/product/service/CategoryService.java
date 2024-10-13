@@ -3,6 +3,7 @@ package cn.wjk.gulimall.product.service;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import cn.wjk.gulimall.product.domain.vo.CategoryVO;
+import cn.wjk.gulimall.product.domain.vo.Catelog2VO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -40,5 +41,15 @@ public interface CategoryService extends IService<CategoryEntity> {
      * 根据catelogId获取该catelog相对于一级catelog的全路径
      */
     Long[] getCatelogPathById(Long catelogId);
+
+    /**
+     * 获取所有的一级分类
+     */
+    List<CategoryEntity> getAllRootCategories();
+
+    /**
+     * 获取所有分类，以规定形式返回
+     */
+    Map<String, List<Catelog2VO>> getCatalogJson();
 }
 

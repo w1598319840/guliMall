@@ -6,6 +6,8 @@ import cn.wjk.gulimall.product.dao.CategoryBrandRelationDao;
 import cn.wjk.gulimall.product.dao.CategoryDao;
 import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import cn.wjk.gulimall.product.domain.vo.CategoryVO;
+import cn.wjk.gulimall.product.domain.vo.Catelog2VO;
+import cn.wjk.gulimall.product.domain.vo.Catelog3VO;
 import cn.wjk.gulimall.product.service.CategoryService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,10 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -108,5 +107,79 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             list.addFirst(currentCatelogId);
         } while (true);
         return list.toArray(new Long[0]);
+    }
+
+    @Override
+    public List<CategoryEntity> getAllRootCategories() {
+        return lambdaQuery().eq(CategoryEntity::getCatLevel, 1)
+                .list();
+    }
+
+    @Override
+    public Map<String, List<Catelog2VO>> getCatalogJson() {
+        List<CategoryEntity> allCategories = this.lambdaQuery().list();
+        Map<Integer, List<CategoryEntity>> catLevelToCategoryMap =
+                allCategories.stream().collect(Collectors.groupingBy(CategoryEntity::getCatLevel));
+        HashMap<String, List<Catelog2VO>> result = new HashMap<>();
+        List<CategoryEntity> firstLevelCategories = catLevelToCategoryMap.get(1);
+        List<CategoryEntity> secondLevelCategories = catLevelToCategoryMap.get(2);
+        List<CategoryEntity> thirdLevelCategories = catLevelToCategoryMap.get(3);
+        for (CategoryEntity firstLevelCategory : firstLevelCategories) {
+            result.put(firstLevelCategory.getCatId().toString(), new ArrayList<>());
+        }
+        Map<Long, List<Catelog3VO>> thirdsecondLevelCategoryParentIdToCatelog3VOMap =
+                thirdLevelCategories.stream().collect(Collectors.groupingBy(CategoryEntity::getParentCid,
+                        //对value再进行一次操作
+                        Collectors.mapping(categoryEntity -> {
+                            Catelog3VO catelog3VO = new Catelog3VO();
+                            catelog3VO.setName(categoryEntity.getName());
+                            catelog3VO.setId(categoryEntity.getCatId().toString());
+                            catelog3VO.setCatalog2Id(categoryEntity.getParentCid().toString());
+                            return catelog3VO;
+                        }, Collectors.toList())));
+        for (CategoryEntity secondLevelCategory : secondLevelCategories) {
+            Long catId = secondLevelCategory.getCatId();
+            Catelog2VO catelog2VO = new Catelog2VO();
+            catelog2VO.setCatalog1Id(secondLevelCategory.getParentCid().toString());
+            catelog2VO.setName(secondLevelCategory.getName());
+            catelog2VO.setId(catId.toString());
+            catelog2VO.setCatalog3List(thirdsecondLevelCategoryParentIdToCatelog3VOMap.get(catId));
+            result.get(secondLevelCategory.getParentCid().toString()).add(catelog2VO);
+        }
+        return result;
+    }
+
+
+    /**
+     * 效率太低
+     */
+    @Deprecated
+    public Map<String, List<Catelog2VO>> getCatalogJsonDeprecated() {
+        List<CategoryVO> firstLevelCat = listWithTree();
+        Map<Long, List<CategoryVO>> firstLevelCatIdToSecondLevelCatMap =
+                firstLevelCat.stream().collect(Collectors.toMap(CategoryVO::getCatId, CategoryVO::getChildren));
+        Map<String, List<Catelog2VO>> result = new HashMap<>();
+        for (Map.Entry<Long, List<CategoryVO>> entry : firstLevelCatIdToSecondLevelCatMap.entrySet()) {
+            String firstLevelCatIdString = entry.getKey().toString();
+            List<Catelog2VO> catelog2VOs = entry.getValue().stream().map(secondLevelCat -> {
+                Catelog2VO catelog2VO = new Catelog2VO();
+                catelog2VO.setId(secondLevelCat.getCatId().toString());
+                catelog2VO.setName(secondLevelCat.getName());
+                catelog2VO.setCatalog1Id(firstLevelCatIdString);
+                List<CategoryVO> thirdLevelCats = secondLevelCat.getChildren();
+                if (thirdLevelCats != null) {
+                    catelog2VO.setCatalog3List(thirdLevelCats.stream().map(thirdLevelCat -> {
+                        Catelog3VO catelog3VO = new Catelog3VO();
+                        catelog3VO.setCatalog2Id(secondLevelCat.getCatId().toString());
+                        catelog3VO.setName(thirdLevelCat.getName());
+                        catelog3VO.setId(thirdLevelCat.getCatId().toString());
+                        return catelog3VO;
+                    }).toList());
+                }
+                return catelog2VO;
+            }).toList();
+            result.put(firstLevelCatIdString, catelog2VOs);
+        }
+        return result;
     }
 }

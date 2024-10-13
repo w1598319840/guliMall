@@ -3,3 +3,6 @@
 gulimall:
   db:
     name: gulimall_pms
+spring:
+  thymeleaf:
+    cache: false

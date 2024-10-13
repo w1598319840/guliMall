@@ -56,5 +56,4 @@ public class CategoryVO {
      */
     @JsonInclude(JsonInclude.Include.NON_EMPTY)//只有当该字段不为空时,才会返回给前端
     private List<CategoryVO> children;
-
 }
