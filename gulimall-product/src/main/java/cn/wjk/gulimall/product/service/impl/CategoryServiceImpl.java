@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.product.service.impl;
 
+import cn.wjk.gulimall.common.constant.RedisConstants;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 import cn.wjk.gulimall.product.dao.CategoryBrandRelationDao;
@@ -9,6 +10,8 @@ import cn.wjk.gulimall.product.domain.vo.CategoryVO;
 import cn.wjk.gulimall.product.domain.vo.Catelog2VO;
 import cn.wjk.gulimall.product.domain.vo.Catelog3VO;
 import cn.wjk.gulimall.product.service.CategoryService;
+import cn.wjk.gulimall.product.utils.RedisUtils;
+import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
     private final CategoryDao categoryDao;
     private final CategoryBrandRelationDao categoryBrandRelationDao;
+    private final RedisUtils redisUtils;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -118,14 +122,32 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     /**
+     * 直接上redis
+     */
+    @Override
+    public Map<String, List<Catelog2VO>> getCatalogJson() {
+        Map<String, List<Catelog2VO>> result;
+        long start = System.currentTimeMillis();
+        result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON, new TypeReference<>() {
+        }, RedisConstants.PRODUCT_CATALOG_JSON_EXPIRE_TIME);
+        long end = System.currentTimeMillis();
+        log.info("redis:{} ms", end - start);
+        if (result != null) {
+            //缓存存在
+            return result;
+        }
+        result = getCatalogJsonFromDB();
+        redisUtils.setCache(RedisConstants.PRODUCT_CATALOG_JSON,
+                result, RedisConstants.PRODUCT_CATALOG_JSON_EXPIRE_TIME);
+        return result;
+    }
+
+    /**
      * 也是一种解决方案
      */
     @Deprecated
     public Map<String, List<Catelog2VO>> getCatalogJsonDeprecated2() {
-        long start = System.currentTimeMillis();
         List<CategoryEntity> allCategories = this.lambdaQuery().list();
-        long end = System.currentTimeMillis();
-        log.debug("CategoryServiceImpl.getCatalogJson查询数据库耗时:{}", end - start);
         List<CategoryEntity> firstLevel = getCategoryByParentId(allCategories, 0);
         return firstLevel.stream().collect(Collectors.toMap(
                 categoryEntity -> categoryEntity.getCatId().toString(),
@@ -165,8 +187,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 还是太慢
      * 后来发现好像是查询数据库的问题，我写的逻辑没啥问题...吧
      */
-    public Map<String, List<Catelog2VO>> getCatalogJson() {
+    public Map<String, List<Catelog2VO>> getCatalogJsonFromDB() {
+        long start = System.currentTimeMillis();
         List<CategoryEntity> allCategories = this.lambdaQuery().list();
+        long end = System.currentTimeMillis();
+        log.info("database:{} ms", end - start);
         Map<Integer, List<CategoryEntity>> catLevelToCategoryMap =
                 allCategories.stream().collect(Collectors.groupingBy(CategoryEntity::getCatLevel));
         HashMap<String, List<Catelog2VO>> result = new HashMap<>();
