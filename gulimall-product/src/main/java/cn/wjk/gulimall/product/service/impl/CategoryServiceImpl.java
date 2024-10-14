@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service("categoryService")
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
     private final CategoryDao categoryDao;
     private final CategoryBrandRelationDao categoryBrandRelationDao;
@@ -115,7 +117,54 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 .list();
     }
 
-    @Override
+    /**
+     * 也是一种解决方案
+     */
+    @Deprecated
+    public Map<String, List<Catelog2VO>> getCatalogJsonDeprecated2() {
+        long start = System.currentTimeMillis();
+        List<CategoryEntity> allCategories = this.lambdaQuery().list();
+        long end = System.currentTimeMillis();
+        log.debug("CategoryServiceImpl.getCatalogJson查询数据库耗时:{}", end - start);
+        List<CategoryEntity> firstLevel = getCategoryByParentId(allCategories, 0);
+        return firstLevel.stream().collect(Collectors.toMap(
+                categoryEntity -> categoryEntity.getCatId().toString(),
+                categoryEntity -> {
+                    List<CategoryEntity> secondLevel = getCategoryByParentId(allCategories, categoryEntity.getCatId());
+                    List<Catelog2VO> catelog2VOs = Collections.emptyList();
+                    if (!secondLevel.isEmpty()) {
+                        catelog2VOs = secondLevel.stream().map(l2 -> {
+                            Long catId = l2.getCatId();
+                            Catelog2VO catelog2VO = new Catelog2VO();
+                            catelog2VO.setCatalog1Id(categoryEntity.getCatId().toString());
+                            catelog2VO.setName(l2.getName());
+                            catelog2VO.setId(catId.toString());
+                            List<Catelog3VO> thirdLevel
+                                    = getCategoryByParentId(allCategories, catId).stream().map(l3 -> {
+                                Catelog3VO catelog3VO = new Catelog3VO();
+                                catelog3VO.setId(l3.getCatId().toString());
+                                catelog3VO.setName(l3.getName());
+                                catelog3VO.setCatalog2Id(catId.toString());
+                                return catelog3VO;
+                            }).toList();
+                            catelog2VO.setCatalog3List(thirdLevel);
+                            return catelog2VO;
+                        }).toList();
+                    }
+                    return catelog2VOs;
+                }
+        ));
+    }
+
+    private List<CategoryEntity> getCategoryByParentId(List<CategoryEntity> allCategories, long parentId) {
+        return allCategories.stream().filter(categoryEntity -> categoryEntity.getParentCid().equals(parentId)).toList();
+    }
+
+
+    /**
+     * 还是太慢
+     * 后来发现好像是查询数据库的问题，我写的逻辑没啥问题...吧
+     */
     public Map<String, List<Catelog2VO>> getCatalogJson() {
         List<CategoryEntity> allCategories = this.lambdaQuery().list();
         Map<Integer, List<CategoryEntity>> catLevelToCategoryMap =
@@ -154,7 +203,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 效率太低
      */
     @Deprecated
-    public Map<String, List<Catelog2VO>> getCatalogJsonDeprecated() {
+    public Map<String, List<Catelog2VO>> getCatalogJsonDeprecated1() {
         List<CategoryVO> firstLevelCat = listWithTree();
         Map<Long, List<CategoryVO>> firstLevelCatIdToSecondLevelCatMap =
                 firstLevelCat.stream().collect(Collectors.toMap(CategoryVO::getCatId, CategoryVO::getChildren));
