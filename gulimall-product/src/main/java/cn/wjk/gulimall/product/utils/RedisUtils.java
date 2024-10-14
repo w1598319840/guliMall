@@ -20,32 +20,8 @@ import java.time.Duration;
 public class RedisUtils {
     private StringRedisTemplate stringRedisTemplate;
 
-    public void setCache(String key, Object value) {
-        stringRedisTemplate.opsForValue().set(key, JSON.toJSONString(value));
-    }
-
     public void setCache(String key, Object value, Duration duration) {
         stringRedisTemplate.opsForValue().set(key, JSON.toJSONString(value), duration);
-    }
-
-    public <T> T getCacheObject(String key, TypeReference<T> typeReference) {
-        String cache = stringRedisTemplate.opsForValue().get(key);
-        if (StringUtils.isEmpty(cache)) {
-            return null;
-        }
-        return JSON.parseObject(cache, typeReference);
-    }
-
-    public <T> T getCacheObject(String key, Class<T> clazz) {
-        String cache = stringRedisTemplate.opsForValue().get(key);
-        if (StringUtils.isEmpty(cache)) {
-            return null;
-        }
-        return JSON.parseObject(cache, clazz);
-    }
-
-    public String getCacheString(String key) {
-        return stringRedisTemplate.opsForValue().get(key);
     }
 
     public <T> T getCacheObject(String key, TypeReference<T> typeReference, Duration duration) {

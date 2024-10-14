@@ -123,6 +123,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     /**
      * 直接上redis
+     * 我们需要解决缓存的三大问题:
+     *  缓存穿透: 缓存空值null
+     *  缓存雪崩: 为expire添加offset
+     *  缓存击穿: 缓存失效重新缓存时添加锁(分布式锁虽好，但性能较低)
      */
     @Override
     public Map<String, List<Catelog2VO>> getCatalogJson() {
@@ -136,9 +140,18 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             //缓存存在
             return result;
         }
-        result = getCatalogJsonFromDB();
-        redisUtils.setCache(RedisConstants.PRODUCT_CATALOG_JSON,
-                result, RedisConstants.PRODUCT_CATALOG_JSON_EXPIRE_TIME);
+        //锁要加在这里
+        synchronized (this) {
+            result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON, new TypeReference<>() {
+            }, RedisConstants.PRODUCT_CATALOG_JSON_EXPIRE_TIME);
+            if (result != null) {
+                //此时其他线程已经添加过缓存了
+                return result;
+            }
+            result = getCatalogJsonFromDB();
+            redisUtils.setCache(RedisConstants.PRODUCT_CATALOG_JSON,
+                    result, RedisConstants.PRODUCT_CATALOG_JSON_EXPIRE_TIME);
+        }
         return result;
     }
 
