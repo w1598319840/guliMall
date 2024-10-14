@@ -11,6 +11,8 @@ import java.time.Duration;
  * @Description: redis的常量类
  */
 public interface RedisConstants {
-    String PRODUCT_CATALOG_JSON = "product:catalog:json";
-    Duration PRODUCT_CATALOG_JSON_EXPIRE_TIME = Duration.ofSeconds(60);
+    String PRODUCT_CATALOG_JSON_DATA_KEY = "product:catalog:json:data";
+    Duration PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME = Duration.ofSeconds(60);
+    String PRODUCT_CATALOG_JSON_LOCK_KEY = "product:catalog:json:lock";
+    Duration PRODUCT_CATALOG_JSON_LOCK_EXPIRE_TIME = Duration.ofSeconds(5);
 }

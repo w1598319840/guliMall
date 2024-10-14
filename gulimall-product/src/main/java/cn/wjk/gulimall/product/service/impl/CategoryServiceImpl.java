@@ -18,10 +18,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +36,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     private final CategoryDao categoryDao;
     private final CategoryBrandRelationDao categoryBrandRelationDao;
     private final RedisUtils redisUtils;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -132,26 +137,17 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public Map<String, List<Catelog2VO>> getCatalogJson() {
         Map<String, List<Catelog2VO>> result;
         long start = System.currentTimeMillis();
-        result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON, new TypeReference<>() {
-        }, RedisConstants.PRODUCT_CATALOG_JSON_EXPIRE_TIME);
+        result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY, new TypeReference<>() {
+        }, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
         long end = System.currentTimeMillis();
         log.info("redis:{} ms", end - start);
         if (result != null) {
             //缓存存在
             return result;
         }
-        //锁要加在这里
-        synchronized (this) {
-            result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON, new TypeReference<>() {
-            }, RedisConstants.PRODUCT_CATALOG_JSON_EXPIRE_TIME);
-            if (result != null) {
-                //此时其他线程已经添加过缓存了
-                return result;
-            }
-            result = getCatalogJsonFromDB();
-            redisUtils.setCache(RedisConstants.PRODUCT_CATALOG_JSON,
-                    result, RedisConstants.PRODUCT_CATALOG_JSON_EXPIRE_TIME);
-        }
+
+//        result = getCatalogJsonFromDBWithLocalLock();
+        result = getCatalogJsonFromDBWithRedisLock();
         return result;
     }
 
@@ -195,19 +191,97 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return allCategories.stream().filter(categoryEntity -> categoryEntity.getParentCid().equals(parentId)).toList();
     }
 
+    /**
+     * 基于redis分布式锁的查询数据库
+     */
+    public synchronized Map<String, List<Catelog2VO>> getCatalogJsonFromDBWithRedisLock() {
+        ValueOperations<String, String> stringOps = stringRedisTemplate.opsForValue();
+        boolean flag;
+        //为防止后续解锁时由于业务耗时太长，锁过期而到期删了别人的锁，我们需要设上当前线程的唯一标识
+        //暂时使用UUID，后续感觉还是使用userId比较好
+        String uuid = UUID.randomUUID().toString();
+        Map<String, List<Catelog2VO>> result;
+        try {
+            flag = Boolean.TRUE.equals(stringOps.setIfAbsent(RedisConstants.PRODUCT_CATALOG_JSON_LOCK_KEY, uuid,
+                    RedisConstants.PRODUCT_CATALOG_JSON_LOCK_EXPIRE_TIME));
+            while (!flag) {
+                //自旋重试
+                try {
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                flag = Boolean.TRUE.equals(stringOps.setIfAbsent(RedisConstants.PRODUCT_CATALOG_JSON_LOCK_KEY, uuid,
+                        RedisConstants.PRODUCT_CATALOG_JSON_LOCK_EXPIRE_TIME));
+            }
+            //成功获取到锁了
+            log.info("获取分布式锁成功");
+            //double check一下
+            result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY,
+                    new TypeReference<>() {
+                    }, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
+            if (result != null) {
+                //此时其他线程已经添加过缓存了
+                return result;
+            }
+            result = getCatalogJsonFromDB();
+            //加缓存
+            redisUtils.setCache(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY,
+                    result, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
+        } finally {
+            //解锁
+            //在finally中保证一定能够解锁
+            //解锁时要判断是不是自己的锁，并且判断和解锁必须是原子操作，那么我们就需要使用lua脚本
+//        String value = stringOps.get(RedisConstants.PRODUCT_CATALOG_JSON_LOCK_KEY);
+//        if (uuid.equals(value)) {
+//            stringRedisTemplate.delete(RedisConstants.PRODUCT_CATALOG_JSON_LOCK_KEY);
+//        }
+            //判断并解锁成功返回1，失败返回0(其实返回值不重要，只要判断并解锁的操作是原子性的就好了)
+            String scriptString = """
+                    if (redis.call('get', KEYS[1]) == ARGV[1])
+                    then
+                        return redis.call('del',KEYS[1])
+                    end
+                    return 0;
+                    """;
+            //构造器传入脚本、返回类型(也可以通过泛型指定返回类型)
+            DefaultRedisScript<Long> script = new DefaultRedisScript<>(scriptString, Long.class);
+            //判断并解锁，返回值不重要
+            stringRedisTemplate.execute(script, List.of(RedisConstants.PRODUCT_CATALOG_JSON_LOCK_KEY), uuid);
+        }
+        return result;
+    }
 
     /**
-     * 还是太慢
-     * 后来发现好像是查询数据库的问题，我写的逻辑没啥问题...吧
+     * 基于本地锁的查询数据库
      */
-    public Map<String, List<Catelog2VO>> getCatalogJsonFromDB() {
+    public synchronized Map<String, List<Catelog2VO>> getCatalogJsonFromDBWithLocalLock() {
+        Map<String, List<Catelog2VO>> result =
+                redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY, new TypeReference<>() {
+                }, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
+        if (result != null) {
+            //此时其他线程已经添加过缓存了
+            return result;
+        }
+
+        result = getCatalogJsonFromDB();
+        redisUtils.setCache(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY,
+                result, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
+        return result;
+    }
+
+    /**
+     * 从数据库中查询
+     */
+    private Map<String, List<Catelog2VO>> getCatalogJsonFromDB() {
+        Map<String, List<Catelog2VO>> result;
         long start = System.currentTimeMillis();
         List<CategoryEntity> allCategories = this.lambdaQuery().list();
         long end = System.currentTimeMillis();
         log.info("database:{} ms", end - start);
         Map<Integer, List<CategoryEntity>> catLevelToCategoryMap =
                 allCategories.stream().collect(Collectors.groupingBy(CategoryEntity::getCatLevel));
-        HashMap<String, List<Catelog2VO>> result = new HashMap<>();
+        result = new HashMap<>();
         List<CategoryEntity> firstLevelCategories = catLevelToCategoryMap.get(1);
         List<CategoryEntity> secondLevelCategories = catLevelToCategoryMap.get(2);
         List<CategoryEntity> thirdLevelCategories = catLevelToCategoryMap.get(3);
