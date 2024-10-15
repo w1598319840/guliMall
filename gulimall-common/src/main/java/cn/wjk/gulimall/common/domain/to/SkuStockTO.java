@@ -3,7 +3,7 @@ package cn.wjk.gulimall.common.domain.to;
 import lombok.Data;
 
 /**
- * @Package: cn.wjk.gulimall.ware.domain.vo
+ * @Package: cn.wjk.gulimall.ware.domain.dto
  * @ClassName: SkuStockTO
  * @Version: 1.0
  * @Author: 温嘉凯

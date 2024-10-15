@@ -3,7 +3,7 @@ package cn.wjk.gulimall.product.domain.vo;
 import lombok.Data;
 
 /**
- * @Package: cn.wjk.gulimall.product.domain.vo
+ * @Package: cn.wjk.gulimall.product.domain.dto
  * @ClassName: CategoryBrandRelationVO
  * @Version: 1.0
  * @Author: 温嘉凯

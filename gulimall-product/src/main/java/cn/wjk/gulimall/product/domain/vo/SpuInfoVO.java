@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @Package: cn.wjk.gulimall.product.domain.vo
+ * @Package: cn.wjk.gulimall.product.domain.dto
  * @ClassName: SpuInfoVO
  * @Version: 1.0
  * @Author: 温嘉凯

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @Package: cn.wjk.gulimall.product.domain.vo
+ * @Package: cn.wjk.gulimall.product.domain.dto
  * @ClassName: Catelog2VO
  * @Version: 1.0
  * @Author: 温嘉凯

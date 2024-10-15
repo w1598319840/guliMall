@@ -48,7 +48,7 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
             BufferedInputStream bufferedInputStream = null;
             try {
                 InputStream inputStream = this.getClass().getClassLoader().
-                        getResourceAsStream("indexJson/productIndex.json");
+                        getResourceAsStream("elasticSearchJson/productIndex.json");
                 if (inputStream != null) {
                     bufferedInputStream = new BufferedInputStream(inputStream);
                     byte[] buffer = new byte[10 * 1024 * 1024];

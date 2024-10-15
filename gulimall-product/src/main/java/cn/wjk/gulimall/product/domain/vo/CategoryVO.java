@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @Package: cn.wjk.gulimall.common.domain.vo
+ * @Package: cn.wjk.gulimall.common.domain.dto
  * @ClassName: CategoryVO
  * @Version: 1.0
  * @Author: 温嘉凯
