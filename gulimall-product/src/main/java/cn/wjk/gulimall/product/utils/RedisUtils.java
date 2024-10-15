@@ -24,8 +24,8 @@ public class RedisUtils {
         stringRedisTemplate.opsForValue().set(key, JSON.toJSONString(value), duration);
     }
 
-    public <T> T getCacheObject(String key, TypeReference<T> typeReference, Duration duration) {
-        String cache = stringRedisTemplate.opsForValue().getAndExpire(key, duration);
+    public <T> T getCacheObject(String key, TypeReference<T> typeReference) {
+        String cache = stringRedisTemplate.opsForValue().get(key);
         if (StringUtils.isEmpty(cache)) {
             return null;
         }

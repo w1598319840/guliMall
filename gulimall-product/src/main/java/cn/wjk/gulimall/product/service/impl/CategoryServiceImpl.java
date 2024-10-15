@@ -17,6 +17,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -37,6 +39,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     private final CategoryBrandRelationDao categoryBrandRelationDao;
     private final RedisUtils redisUtils;
     private final StringRedisTemplate stringRedisTemplate;
+    private final RedissonClient redisson;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -138,7 +141,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         Map<String, List<Catelog2VO>> result;
         long start = System.currentTimeMillis();
         result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY, new TypeReference<>() {
-        }, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
+        });
         long end = System.currentTimeMillis();
         log.info("redis:{} ms", end - start);
         if (result != null) {
@@ -147,8 +150,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         }
 
 //        result = getCatalogJsonFromDBWithLocalLock();
-        result = getCatalogJsonFromDBWithRedisLock();
+//        result = getCatalogJsonFromDBWithRedisLock();
+        result = getCatalogJsonFromDBWithRedisson();
         return result;
+
     }
 
     /**
@@ -192,6 +197,31 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     /**
+     * 基于redisson的查询数据库
+     */
+    private Map<String, List<Catelog2VO>> getCatalogJsonFromDBWithRedisson() {
+        Map<String, List<Catelog2VO>> result;
+        RLock lock = redisson.getLock(RedisConstants.PRODUCT_CATALOG_JSON_LOCK_KEY);
+        try {
+            lock.lock();
+            //double check一下
+            result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY, new TypeReference<>() {
+            });
+            if (result != null) {
+                //此时其他线程已经添加过缓存了
+                return result;
+            }
+            result = getCatalogJsonFromDB();
+            //加缓存
+            redisUtils.setCache(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY,
+                    result, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
+        } finally {
+            lock.unlock();
+        }
+        return result;
+    }
+
+    /**
      * 基于redis分布式锁的查询数据库
      */
     public synchronized Map<String, List<Catelog2VO>> getCatalogJsonFromDBWithRedisLock() {
@@ -217,9 +247,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             //成功获取到锁了
             log.info("获取分布式锁成功");
             //double check一下
-            result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY,
-                    new TypeReference<>() {
-                    }, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
+            result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY, new TypeReference<>() {
+            });
             if (result != null) {
                 //此时其他线程已经添加过缓存了
                 return result;
@@ -258,7 +287,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public synchronized Map<String, List<Catelog2VO>> getCatalogJsonFromDBWithLocalLock() {
         Map<String, List<Catelog2VO>> result =
                 redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY, new TypeReference<>() {
-                }, RedisConstants.PRODUCT_CATALOG_JSON_DATA_EXPIRE_TIME);
+                });
         if (result != null) {
             //此时其他线程已经添加过缓存了
             return result;
