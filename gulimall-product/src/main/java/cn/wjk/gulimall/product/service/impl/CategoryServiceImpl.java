@@ -20,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -93,6 +95,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         categoryDao.deleteByIds(ids);
     }
 
+    //批量操作使用@Caching
+//    @Caching(evict = {@CacheEvict(value = RedisConstants.PRODUCT_CATEGORY_PREFIX, key = "'root'"),
+//            @CacheEvict(value = RedisConstants.PRODUCT_CATEGORY_PREFIX, key = "'json'")})
+    //删除该分区下的所有key(缓存的key是这样的 (prefix)+(value)::(key))
+    @CacheEvict(value = RedisConstants.PRODUCT_CATEGORY_PREFIX, allEntries = true)
     @Override
     @Transactional
     public void updateCascade(CategoryEntity category) {
@@ -123,10 +130,21 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return list.toArray(new Long[0]);
     }
 
+    //当前方法返回值需要进行缓存
+    @Cacheable(value = RedisConstants.PRODUCT_CATEGORY_PREFIX, key = "'root'")
     @Override
     public List<CategoryEntity> getAllRootCategories() {
         return lambdaQuery().eq(CategoryEntity::getCatLevel, 1)
                 .list();
+    }
+
+    /**
+     * 基于SpringCache
+     */
+    @Cacheable(value = RedisConstants.PRODUCT_CATEGORY_PREFIX, key = "'json'")
+    @Override
+    public Map<String, List<Catelog2VO>> getCatalogJson() {
+        return getCatalogJsonFromDB();
     }
 
     /**
@@ -136,8 +154,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *  缓存雪崩: 为expire添加offset
      *  缓存击穿: 缓存失效重新缓存时添加锁(分布式锁虽好，但性能较低)
      */
-    @Override
-    public Map<String, List<Catelog2VO>> getCatalogJson() {
+    public Map<String, List<Catelog2VO>> getCatalogJson2() {
         Map<String, List<Catelog2VO>> result;
         long start = System.currentTimeMillis();
         result = redisUtils.getCacheObject(RedisConstants.PRODUCT_CATALOG_JSON_DATA_KEY, new TypeReference<>() {

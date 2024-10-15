@@ -16,4 +16,5 @@ spring:
           - data-id: gulimall-shared-mybatis.yaml
           - data-id: gulimall-shared-jackson.yaml
           - data-id: gulimall-shared-redis.yaml
+          - data-id: gulimall-shared-cache.yaml
         namespace: 2c3d3b29-c176-4957-ba09-3d81f6afa63d
