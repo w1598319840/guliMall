@@ -10,4 +10,5 @@ package cn.wjk.gulimall.search.constrant;
  */
 public interface ESConstant {
     String PRODUCT_INDEX = "product";
+    Integer PRODUCT_PAGE_SIZE = 2;
 }
