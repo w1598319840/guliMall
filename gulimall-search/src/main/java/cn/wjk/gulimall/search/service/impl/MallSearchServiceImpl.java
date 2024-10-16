@@ -1,9 +1,11 @@
 package cn.wjk.gulimall.search.service.impl;
 
+import cn.wjk.gulimall.common.domain.to.es.SkuEsModel;
 import cn.wjk.gulimall.common.domain.vo.SearchVO;
 import cn.wjk.gulimall.search.constrant.ESConstant;
 import cn.wjk.gulimall.search.domain.dto.SearchDTO;
 import cn.wjk.gulimall.search.service.MallSearchService;
+import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -12,19 +14,30 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.elasticsearch.search.aggregations.bucket.nested.ParsedNested;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedLongTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package: cn.wjk.gulimall.search.service.impl
@@ -54,14 +67,101 @@ public class MallSearchServiceImpl implements MallSearchService {
             log.error(e.getMessage());
         }
 
-        return parseResponse(response);
+        return parseResponse(response, searchDTO.getPageNum());
     }
 
     /**
      * 解析返回结果
      */
-    private SearchVO parseResponse(SearchResponse response) {
-        return null;
+    private SearchVO parseResponse(SearchResponse response, Integer pageNum) {
+        if (response == null) {
+            return null;
+        }
+        //====以下数据在hits中
+        SearchHits searchHits = response.getHits();
+        SearchVO searchVO = new SearchVO();
+        searchVO.setProducts(parseProductVOs(searchHits.getHits()));
+        searchVO.setPageNum(pageNum);
+        long total = searchHits.getTotalHits().value;
+        searchVO.setTotal(total);
+        searchVO.setTotalPages((int) (total + ESConstant.PRODUCT_PAGE_SIZE - 1) / ESConstant.PRODUCT_PAGE_SIZE);
+        //====以下数据在aggregation中====
+        Aggregations aggregations = response.getAggregations();
+        searchVO.setAttrs(parseAttrVOs(aggregations));
+        searchVO.setBrands(parseBrandVOs(aggregations));
+        searchVO.setCatalogs(parseCatalogVOs(aggregations));
+
+        return searchVO;
+    }
+
+    /**
+     * 解析productVO
+     */
+    private List<SkuEsModel> parseProductVOs(SearchHit[] hits) {
+        return Arrays.stream(hits).map(hit -> {
+            //替换highlight部分
+            SkuEsModel skuEsModel = JSON.parseObject(hit.getSourceAsString(), SkuEsModel.class);
+            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+            if (highlightFields != null && !highlightFields.isEmpty()) {
+                HighlightField highlightField = highlightFields.get("skuTitle");
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Text fragment : highlightField.getFragments()) {
+                    stringBuilder.append(fragment);
+                }
+                skuEsModel.setSkuTitle(stringBuilder.toString());
+            }
+            return skuEsModel;
+        }).toList();
+    }
+
+    /**
+     * 解析CatalogVO
+     */
+    private List<SearchVO.CatalogVO> parseCatalogVOs(Aggregations aggregations) {
+        ParsedLongTerms catalogAgg = aggregations.get("catalog_agg");
+        return catalogAgg.getBuckets().stream().map(bucket -> {
+            SearchVO.CatalogVO catalogVO = new SearchVO.CatalogVO();
+            catalogVO.setCatalogId(bucket.getKeyAsNumber().longValue());
+            ParsedStringTerms catalogNameAgg = bucket.getAggregations().get("catalog_name_agg");
+            catalogVO.setCatalogName(catalogNameAgg.getBuckets().getFirst().getKeyAsString());
+            return catalogVO;
+        }).toList();
+    }
+
+    /**
+     * 解析brandVO
+     */
+    private List<SearchVO.BrandVO> parseBrandVOs(Aggregations aggregations) {
+        ParsedLongTerms brandAgg = aggregations.get("brand_agg");
+        return brandAgg.getBuckets().stream().map(bucket -> {
+            SearchVO.BrandVO brandVO = new SearchVO.BrandVO();
+            brandVO.setBrandId(bucket.getKeyAsNumber().longValue());
+            Aggregations subAgg = bucket.getAggregations();
+            ParsedStringTerms brandNameAgg = subAgg.get("brand_name_agg");
+            brandVO.setBrandName(brandNameAgg.getBuckets().getFirst().getKeyAsString());
+            ParsedStringTerms brandImgAgg = subAgg.get("brand_img_agg");
+            brandVO.setBrandImg(brandImgAgg.getBuckets().getFirst().getKeyAsString());
+            return brandVO;
+        }).toList();
+    }
+
+    /**
+     * 获取AttrVO
+     */
+    private List<SearchVO.AttrVO> parseAttrVOs(Aggregations aggregations) {
+        ParsedNested attrAgg = aggregations.get("attr_agg");
+        ParsedLongTerms attrIdAgg = attrAgg.getAggregations().get("attr_id_agg");
+        return attrIdAgg.getBuckets().stream().map(bucket -> {
+            SearchVO.AttrVO attrVO = new SearchVO.AttrVO();
+            attrVO.setAttrId(bucket.getKeyAsNumber().longValue());
+            Aggregations subAgg = bucket.getAggregations();
+            ParsedStringTerms attrNameAgg = subAgg.get("attr_name_agg");
+            attrVO.setAttrName(attrNameAgg.getBuckets().getFirst().getKeyAsString());
+            ParsedStringTerms attrValueAgg = subAgg.get("attr_value_agg");
+            attrVO.setAttrValue(attrValueAgg.getBuckets().stream().map(MultiBucketsAggregation.Bucket::getKeyAsString)
+                    .toList());
+            return attrVO;
+        }).toList();
     }
 
     /**

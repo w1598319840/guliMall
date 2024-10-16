@@ -45,21 +45,21 @@ public class SearchVO {
     private List<CatalogVO> catalogs;
 
     @Data
-    private static class BrandVO {
+    public static class BrandVO {
         private Long brandId;
         private String brandName;
         private String brandImg;
     }
 
     @Data
-    private static class AttrVO {
+    public static class AttrVO {
         private Long attrId;
         private String attrName;
         private List<String> attrValue;
     }
 
     @Data
-    private static class CatalogVO {
+    public static class CatalogVO {
         private Long catalogId;
         private String catalogName;
     }
