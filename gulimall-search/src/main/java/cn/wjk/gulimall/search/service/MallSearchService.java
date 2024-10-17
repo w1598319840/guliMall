@@ -2,6 +2,7 @@ package cn.wjk.gulimall.search.service;
 
 import cn.wjk.gulimall.common.domain.vo.SearchVO;
 import cn.wjk.gulimall.search.domain.dto.SearchDTO;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @Package: cn.wjk.gulimall.search.service
@@ -15,5 +16,5 @@ public interface MallSearchService {
     /**
      * 检索商品
      */
-    SearchVO search(SearchDTO searchDTO);
+    SearchVO search(SearchDTO searchDTO, HttpServletRequest request);
 }

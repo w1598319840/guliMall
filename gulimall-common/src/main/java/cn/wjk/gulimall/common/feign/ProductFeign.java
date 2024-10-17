@@ -17,6 +17,9 @@ import java.util.List;
  */
 @FeignClient("gulimall-product")
 public interface ProductFeign {
-    @GetMapping("/product/skuinfo//info/skuName")
+    @GetMapping("/product/skuinfo/info/skuName")
     R getSkuNamesBySkuIds(@RequestParam("skuIds") List<Long> skuIds);
+
+    @GetMapping("/product/attr/name")
+    R getAttrNameByAttrIds(@RequestParam("attrIds") List<Long> attrIds);
 }

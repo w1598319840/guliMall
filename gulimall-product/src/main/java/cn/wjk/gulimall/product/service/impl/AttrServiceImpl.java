@@ -2,6 +2,7 @@ package cn.wjk.gulimall.product.service.impl;
 
 import cn.wjk.gulimall.common.constant.ProductConstant;
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
+import cn.wjk.gulimall.common.domain.to.AttrTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 import cn.wjk.gulimall.product.dao.AttrAttrgroupRelationDao;
@@ -9,7 +10,10 @@ import cn.wjk.gulimall.product.dao.AttrDao;
 import cn.wjk.gulimall.product.dao.AttrGroupDao;
 import cn.wjk.gulimall.product.dao.CategoryDao;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
-import cn.wjk.gulimall.product.domain.entity.*;
+import cn.wjk.gulimall.product.domain.entity.AttrAttrgroupRelationEntity;
+import cn.wjk.gulimall.product.domain.entity.AttrEntity;
+import cn.wjk.gulimall.product.domain.entity.AttrGroupEntity;
+import cn.wjk.gulimall.product.domain.entity.CategoryEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import cn.wjk.gulimall.product.service.AttrService;
 import cn.wjk.gulimall.product.service.CategoryService;
@@ -274,5 +278,18 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         removeByIds(attrIds);
         //删除属性关联信息
         attrAttrgroupRelationDao.delete(new QueryWrapper<AttrAttrgroupRelationEntity>().in("attr_id", attrIds));
+    }
+
+    @Override
+    public List<AttrTO> getAttrNameByIds(List<Long> attrIds) {
+        if (attrIds == null || attrIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return this.lambdaQuery().in(AttrEntity::getAttrId, attrIds).list()
+                .stream().map(attrEntity -> {
+                    AttrTO attrTO = new AttrTO();
+                    BeanUtils.copyProperties(attrEntity, attrTO);
+                    return attrTO;
+                }).toList();
     }
 }

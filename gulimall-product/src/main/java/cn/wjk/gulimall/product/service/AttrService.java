@@ -1,6 +1,7 @@
 package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
+import cn.wjk.gulimall.common.domain.to.AttrTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
 import cn.wjk.gulimall.product.domain.entity.AttrEntity;
@@ -60,5 +61,10 @@ public interface AttrService extends IService<AttrEntity> {
      * 级联删除
      */
     void removeCascadeByIds(List<Long> attrIds);
+
+    /**
+     * 根据AttrId获取AttrName
+     */
+    List<AttrTO> getAttrNameByIds(List<Long> attrIds);
 }
 

@@ -1,11 +1,19 @@
 package cn.wjk.gulimall.search.service.impl;
 
+import cn.wjk.gulimall.common.domain.to.AttrTO;
 import cn.wjk.gulimall.common.domain.to.es.SkuEsModel;
 import cn.wjk.gulimall.common.domain.vo.SearchVO;
+import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+import cn.wjk.gulimall.common.exception.RPCException;
+import cn.wjk.gulimall.common.feign.ProductFeign;
+import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.search.constrant.ESConstant;
 import cn.wjk.gulimall.search.domain.dto.SearchDTO;
 import cn.wjk.gulimall.search.service.MallSearchService;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
+import com.alibaba.nacos.shaded.com.google.common.base.Charsets;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -35,9 +43,9 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.net.URLEncoder;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Package: cn.wjk.gulimall.search.service.impl
@@ -52,13 +60,14 @@ import java.util.Map;
 @Slf4j
 public class MallSearchServiceImpl implements MallSearchService {
     private final RestHighLevelClient restHighLevelClient;
+    private final ProductFeign productFeign;
 
     @Override
-    public SearchVO search(SearchDTO searchDTO) {
+    public SearchVO search(SearchDTO searchDTO, HttpServletRequest request) {
         SearchRequest searchRequest = new SearchRequest(ESConstant.PRODUCT_INDEX);
 
         buildCondition(searchDTO, searchRequest.source());
-        log.info("DLS = {}", searchRequest.source().toString());
+//        log.info("DLS = {}", searchRequest.source().toString());
 
         SearchResponse response = null;
         try {
@@ -67,13 +76,13 @@ public class MallSearchServiceImpl implements MallSearchService {
             log.error(e.getMessage());
         }
 
-        return parseResponse(response, searchDTO.getPageNum());
+        return parseResponse(response, searchDTO, request);
     }
 
     /**
      * 解析返回结果
      */
-    private SearchVO parseResponse(SearchResponse response, Integer pageNum) {
+    private SearchVO parseResponse(SearchResponse response, SearchDTO searchDTO, HttpServletRequest request) {
         if (response == null) {
             return null;
         }
@@ -81,10 +90,19 @@ public class MallSearchServiceImpl implements MallSearchService {
         SearchHits searchHits = response.getHits();
         SearchVO searchVO = new SearchVO();
         searchVO.setProducts(parseProductVOs(searchHits.getHits()));
-        searchVO.setPageNum(pageNum);
+        searchVO.setPageNum(searchDTO.getPageNum());
         long total = searchHits.getTotalHits().value;
+        int totalPages = (int) (total + ESConstant.PRODUCT_PAGE_SIZE - 1) / ESConstant.PRODUCT_PAGE_SIZE;
         searchVO.setTotal(total);
-        searchVO.setTotalPages((int) (total + ESConstant.PRODUCT_PAGE_SIZE - 1) / ESConstant.PRODUCT_PAGE_SIZE);
+        searchVO.setTotalPages(totalPages);
+        List<Integer> navs = new ArrayList<>();
+        for (int i = 1; i <= totalPages; i++) {
+            navs.add(i);
+        }
+        searchVO.setPageNavs(navs);
+        List<String> attrs = searchDTO.getAttrs();
+        searchVO.setNavs(getNavs(searchDTO, request));
+        searchVO.setAttrIds(getAttrIds(attrs));
         //====以下数据在aggregation中====
         Aggregations aggregations = response.getAggregations();
         searchVO.setAttrs(parseAttrVOs(aggregations));
@@ -92,6 +110,77 @@ public class MallSearchServiceImpl implements MallSearchService {
         searchVO.setCatalogs(parseCatalogVOs(aggregations));
 
         return searchVO;
+    }
+
+    /**
+     * 获取所有的attrId
+     */
+    private List<Long> getAttrIds(List<String> attrs) {
+        if (attrs == null || attrs.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return attrs.stream().map(attr -> Long.parseLong(attr.split("_")[0])).toList();
+    }
+
+    /**
+     * 构建面包屑导航
+     * 里面包含了用户查询时的每个属性的参数
+     */
+    @SuppressWarnings("all")
+    private List<SearchVO.NavVO> getNavs(SearchDTO searchDTO, HttpServletRequest request) {
+        ArrayList<SearchVO.NavVO> navVOs = new ArrayList<>();
+        String queryString = request.getQueryString();
+        //获取attr的面包屑导航
+        navVOs.addAll(getAttrNavs(searchDTO.getAttrs(), queryString));
+        //====下面的面包屑导航就不做了，太傻逼了====
+//        //获取brand的面包屑导航
+//        navVOs.addAll(getBrandNavs(searchDTO.getBrandId(), queryString));
+//        //获取catalog的面包屑导航
+//        navVOs.addAll(getCatalogNavs(searchDTO.getCatalog3Id(), queryString));
+        return navVOs;
+    }
+
+//    private List<SearchVO.NavVO> getCatalogNavs(Long catalog3Ids, String queryString) {
+//        if (catalog3Ids == null) {
+//            return Collections.emptyList();
+//        }
+//    }
+//
+//    private List<SearchVO.NavVO> getBrandNavs(List<Long> brandIds, String queryString) {
+//        if (brandIds == null || brandIds.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//    }
+
+    /**
+     * 获取attr的面包屑导航
+     * attrs=1_其他:安卓&attrs=2_5寸:6寸
+     */
+    private List<SearchVO.NavVO> getAttrNavs(List<String> attrs, String queryString) {
+        if (attrs == null || attrs.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> attrIds = getAttrIds(attrs);
+        R result = productFeign.getAttrNameByAttrIds(attrIds);
+        if (result.getCode() != 0) {
+            throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
+        }
+        List<AttrTO> attrTOs = JSON.parseObject(((String) result.get("data")), new TypeReference<>() {
+        });
+        Map<Long, String> attrIdToAttrNameMap = attrTOs.stream()
+                .collect(Collectors.toMap(AttrTO::getAttrId, AttrTO::getAttrName));
+        return attrs.stream().map(attr -> {
+            SearchVO.NavVO navVO = new SearchVO.NavVO();
+            String[] array = attr.split("_");
+            navVO.setNavName(attrIdToAttrNameMap.get(Long.parseLong(array[0])));
+            navVO.setNavValue(array[1]);
+            //需要将中文编码后再替换
+            //并且我们需要注意，对于` `空格，浏览器会编码为`%20`，而java会编码为`+`，因此我们还需要进一步处理
+            navVO.setLink("http://search.gulimall.com/list.html?" +
+                    queryString.replace("&attrs=" + URLEncoder.encode(attr, Charsets.UTF_8)
+                            .replace("+", "%20"), ""));
+            return navVO;
+        }).toList();
     }
 
     /**
@@ -278,7 +367,7 @@ public class MallSearchServiceImpl implements MallSearchService {
             boolQueryBuilder.filter(QueryBuilders.termQuery("hasStock", hasStock == 1));
         }
         String skuPriceString = searchDTO.getSkuPrice();
-        if (StringUtils.isNotEmpty(skuPriceString)) {
+        if (StringUtils.isNotEmpty(skuPriceString) && !skuPriceString.equals("_")) {
             int index = skuPriceString.indexOf('_');
             String[] minAndMaxSkuPrice = skuPriceString.split("_");
             int maxSkuPrice = -1;

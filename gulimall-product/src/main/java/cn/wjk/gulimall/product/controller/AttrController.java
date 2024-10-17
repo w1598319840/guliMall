@@ -1,6 +1,7 @@
 package cn.wjk.gulimall.product.controller;
 
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
+import cn.wjk.gulimall.common.domain.to.AttrTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.product.domain.dto.AttrDTO;
@@ -9,6 +10,7 @@ import cn.wjk.gulimall.product.domain.entity.ProductAttrValueEntity;
 import cn.wjk.gulimall.product.domain.vo.AttrVO;
 import cn.wjk.gulimall.product.service.AttrService;
 import cn.wjk.gulimall.product.service.ProductAttrValueService;
+import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -107,5 +109,14 @@ public class AttrController {
     public R updateSpuAttr(@PathVariable("spuId") Long spuId, @RequestBody List<UpdateSpuAttrDTO> updateSpuAttrs) {
         productAttrValueService.updateSpuAttr(spuId, updateSpuAttrs);
         return R.ok();
+    }
+
+    /**
+     * 根据attrId获取attrName
+     */
+    @GetMapping("/name")
+    public R getAttrNameByAttrIds(@RequestParam("attrIds") List<Long> attrIds) {
+        List<AttrTO> attrTOs = attrService.getAttrNameByIds(attrIds);
+        return R.ok().put("data", JSON.toJSONString(attrTOs));
     }
 }
