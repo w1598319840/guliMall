@@ -28,6 +28,7 @@ public class ItemController {
     public ModelAndView item(@PathVariable("skuId") Long skuId) {
         ModelAndView modelAndView = new ModelAndView("item");
         SkuItemVO skuItemVO = itemService.getItemDetail(skuId);
+        modelAndView.addObject("item", skuItemVO);
         return modelAndView;
     }
 }

@@ -23,12 +23,19 @@ public class SkuItemVO {
     private List<ItemSaleAttrVO> saleAttr;
     private List<SpuItemAttrGroupVO> groupAttrs;
 
-
     @Data
     public static class ItemSaleAttrVO {
         private Long attrId;
         private String attrName;
-        private List<String> attrValues;
+        private List<AttrValueWithSkuIdVO> attrValues;
+    }
+
+    @Data
+    public static class AttrValueWithSkuIdVO{
+        private String attrValue;
+        //每个attr下的skuId -> 12,13,14
+        //类似于倒排索引
+        private String skuIds;
     }
 
     @Data

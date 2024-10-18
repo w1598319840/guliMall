@@ -6,6 +6,7 @@ import cn.wjk.gulimall.product.domain.entity.SkuInfoEntity;
 import cn.wjk.gulimall.product.domain.entity.SkuSaleAttrValueEntity;
 import cn.wjk.gulimall.product.domain.vo.SkuItemVO;
 import cn.wjk.gulimall.product.service.ItemService;
+import com.alibaba.nacos.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -59,10 +60,10 @@ public class ItemServiceImpl implements ItemService {
         //1.根据spuId查询出其旗下所有的sku
         List<SkuInfoEntity> skuInfoEntities = skuInfoDao.selectList(new QueryWrapper<SkuInfoEntity>()
                 .eq("spu_id", spuId));
-
         if (skuInfoEntities == null || skuInfoEntities.isEmpty()) {
             return Collections.emptyList();
         }
+
         //2.查询出这些sku所有的attrVO
         List<Long> skuIds = skuInfoEntities.stream().map(SkuInfoEntity::getSkuId).toList();
         List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = skuSaleAttrValueDao
@@ -71,16 +72,26 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toMap(SkuSaleAttrValueEntity::getAttrId, SkuSaleAttrValueEntity::getAttrName,
                         //如果出现重复的key，如何处理
                         (existing, replacement) -> existing));
-        Map<Long, List<String>> attrIdToAttrValuesMap =
-                skuSaleAttrValueEntities.stream().collect(Collectors.groupingBy(SkuSaleAttrValueEntity::getAttrId,
-                        Collectors.mapping(SkuSaleAttrValueEntity::getAttrValue, Collectors.toList())));
+        Map<Long, List<SkuSaleAttrValueEntity>> attrIdToSkuSalAttrValueEntityMap =
+                skuSaleAttrValueEntities.stream().collect(Collectors.groupingBy(SkuSaleAttrValueEntity::getAttrId));
         return attrIdToAttrNameMap.entrySet().stream().map(entry -> {
             SkuItemVO.ItemSaleAttrVO itemSaleAttrVO = new SkuItemVO.ItemSaleAttrVO();
             Long attrId = entry.getKey();
             String attrName = entry.getValue();
             itemSaleAttrVO.setAttrId(attrId);
             itemSaleAttrVO.setAttrName(attrName);
-            itemSaleAttrVO.setAttrValues(attrIdToAttrValuesMap.get(attrId).stream().distinct().toList());
+            //将某一个属性的下所有的entity取出，并构建成List<AttrValueWithSkuIdVO>
+            Map<String, List<Long>> attrValueToSkuIdsMap =
+                    attrIdToSkuSalAttrValueEntityMap.get(attrId).stream().collect(Collectors.groupingBy(
+                            SkuSaleAttrValueEntity::getAttrValue, Collectors.mapping(
+                                    SkuSaleAttrValueEntity::getSkuId, Collectors.toList())));
+            itemSaleAttrVO.setAttrValues(attrValueToSkuIdsMap.entrySet().stream().map(e -> {
+                List<Long> skuIdList = e.getValue();
+                SkuItemVO.AttrValueWithSkuIdVO vo = new SkuItemVO.AttrValueWithSkuIdVO();
+                vo.setAttrValue(e.getKey());
+                vo.setSkuIds(StringUtils.join(skuIdList, ","));
+                return vo;
+            }).toList());
             return itemSaleAttrVO;
         }).toList();
     }
