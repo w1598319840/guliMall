@@ -9,11 +9,15 @@ import cn.wjk.gulimall.product.service.ItemService;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -26,12 +30,14 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemServiceImpl implements ItemService {
     private final SkuInfoDao skuInfoDao;
     private final SkuImagesDao skuImagesDao;
     private final SpuInfoDescDao spuInfoDescDao;
     private final SkuSaleAttrValueDao skuSaleAttrValueDao;
     private final AttrGroupDao attrGroupDao;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public SkuItemVO getItemDetail(Long skuId) {
@@ -39,17 +45,36 @@ public class ItemServiceImpl implements ItemService {
             return null;
         }
         SkuItemVO skuItemVO = new SkuItemVO();
-        SkuInfoEntity skuInfoEntity = skuInfoDao.selectById(skuId);
+        CompletableFuture<SkuInfoEntity> infoFuture = CompletableFuture.supplyAsync(() -> {
+            SkuInfoEntity skuInfoEntity = skuInfoDao.selectById(skuId);
+            if (skuInfoEntity == null) {
+                return null;
+            }
+            skuItemVO.setInfo(skuInfoEntity);
+            return skuInfoEntity;
+        }, threadPoolExecutor);
+        CompletableFuture<Void> imageFuture = CompletableFuture.runAsync(() ->
+                skuItemVO.setImages(skuImagesDao.selectList(new QueryWrapper<SkuImagesEntity>()
+                        .eq("sku_id", skuId))), threadPoolExecutor);
+        //以下任务都需要任务1的完成，等待任务1的完成
+        SkuInfoEntity skuInfoEntity = null;
+        try {
+            skuInfoEntity = infoFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage(), e);
+        }
         if (skuInfoEntity == null) {
             return null;
         }
-        skuItemVO.setInfo(skuInfoEntity);
-        skuItemVO.setImages(skuImagesDao.selectList(new QueryWrapper<SkuImagesEntity>()
-                .eq("sku_id", skuId)));
         Long spuId = skuInfoEntity.getSpuId();
-        skuItemVO.setDesp(spuInfoDescDao.selectById(spuId));
-        skuItemVO.setGroupAttrs(attrGroupDao.selectGroupAttrsWithSpuIdAndCatalogId(spuId, skuInfoEntity.getCatalogId()));
-        skuItemVO.setSaleAttr(getSaleAttr(spuId));
+        CompletableFuture<Void> despFuture = CompletableFuture.runAsync(() ->
+                skuItemVO.setDesp(spuInfoDescDao.selectById(spuId)), threadPoolExecutor);
+        SkuInfoEntity finalSkuInfoEntity = skuInfoEntity;
+        CompletableFuture<Void> groupAttrsFuture = CompletableFuture.runAsync(() ->
+                skuItemVO.setGroupAttrs(attrGroupDao.selectGroupAttrsWithSpuIdAndCatalogId(spuId, finalSkuInfoEntity.getCatalogId())), threadPoolExecutor);
+        CompletableFuture<Void> saleAttrFuture = CompletableFuture.runAsync(() ->
+                skuItemVO.setSaleAttr(getSaleAttr(spuId)), threadPoolExecutor);
+        CompletableFuture.allOf(infoFuture, imageFuture, despFuture, groupAttrsFuture, saleAttrFuture).join();
         return skuItemVO;
     }
 

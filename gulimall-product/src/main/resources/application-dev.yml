@@ -3,6 +3,10 @@
 gulimall:
   db:
     name: gulimall_pms
+  thread:
+    corePoolSize: 20
+    maxPoolSize: 200
+    keepAliveTime: 60s
 spring:
   thymeleaf:
     cache: false
