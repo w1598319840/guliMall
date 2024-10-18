@@ -176,9 +176,9 @@ public class MallSearchServiceImpl implements MallSearchService {
             navVO.setNavValue(array[1]);
             //需要将中文编码后再替换
             //并且我们需要注意，对于` `空格，浏览器会编码为`%20`，而java会编码为`+`，因此我们还需要进一步处理
-            navVO.setLink("http://search.gulimall.com/list.html?" +
-                    queryString.replace("&attrs=" + URLEncoder.encode(attr, Charsets.UTF_8)
-                            .replace("+", "%20"), ""));
+            String linkQueryString = "&attrs=" + URLEncoder.encode(attr, Charsets.UTF_8).replace("+", "%20");
+            String link = "http://search.gulimall.com/list.html?" + queryString.replace(linkQueryString, "");
+            navVO.setLink(link);
             return navVO;
         }).toList();
     }
