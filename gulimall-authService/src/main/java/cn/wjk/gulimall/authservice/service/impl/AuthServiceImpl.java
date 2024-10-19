@@ -1,13 +1,18 @@
 package cn.wjk.gulimall.authservice.service.impl;
 
+import cn.wjk.gulimall.authservice.domain.dto.UserRegisterDTO;
 import cn.wjk.gulimall.authservice.service.AuthService;
 import cn.wjk.gulimall.common.constant.RedisConstants;
+import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
 import cn.wjk.gulimall.common.exception.ObtainVerificationCodeException;
 import cn.wjk.gulimall.common.exception.RPCException;
+import cn.wjk.gulimall.common.exception.RegisterException;
+import cn.wjk.gulimall.common.feign.MemberFeign;
 import cn.wjk.gulimall.common.feign.ThirdPartyFeign;
 import cn.wjk.gulimall.common.utils.R;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -28,6 +33,7 @@ import java.util.Random;
 public class AuthServiceImpl implements AuthService {
     private final ThirdPartyFeign thirdPartyFeign;
     private final StringRedisTemplate stringRedisTemplate;
+    private final MemberFeign memberFeign;
 
     @Override
     public void sendCode(String phone) {
@@ -53,5 +59,30 @@ public class AuthServiceImpl implements AuthService {
         //存入Redis(同时要存入防刷时间)
         stringOps.set(key,
                 code + "_" + System.currentTimeMillis(), Duration.ofMinutes(3L));
+    }
+
+    @Override
+    public void register(UserRegisterDTO userRegisterDTO) {
+        ValueOperations<String, String> stringOps = stringRedisTemplate.opsForValue();
+        String key = RedisConstants.AUTH_LOGIN_CODE_PREFIX + userRegisterDTO.getPhone();
+        //判断验证码
+        String redisCode = stringOps.get(key);
+        if (redisCode == null || !userRegisterDTO.getCode().equals(redisCode.split("_")[0])) {
+            throw new RegisterException(BizHttpStatusEnum.ERROR_CODE_EXCEPTION);
+        }
+        stringRedisTemplate.delete(key);
+
+        //开始注册
+        UserRegisterTO userRegisterTO = new UserRegisterTO();
+        BeanUtils.copyProperties(userRegisterDTO, userRegisterTO);
+        R result = memberFeign.register(userRegisterTO);
+        int code = result.getCode();
+        if (code == BizHttpStatusEnum.PHONE_ALREADY_USED_EXCEPTION.getCode()) {
+            throw new RegisterException(BizHttpStatusEnum.PHONE_ALREADY_USED_EXCEPTION);
+        } else if (code == BizHttpStatusEnum.USERNAME_ALREADY_EXIST_EXCEPTION.getCode()) {
+            throw new RegisterException(BizHttpStatusEnum.USERNAME_ALREADY_EXIST_EXCEPTION);
+        } else if (code != 0) {
+            throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
+        }
     }
 }

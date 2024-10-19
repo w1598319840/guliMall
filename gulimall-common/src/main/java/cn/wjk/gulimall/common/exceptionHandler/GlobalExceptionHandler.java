@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+    /**
+     * 数据校验异常处理器
+     */
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public R handleValidException(MethodArgumentNotValidException e) {
         log.error("数据校验出错:{}, 异常类型:{}", e.getMessage(), e.getClass());
@@ -39,6 +42,9 @@ public class GlobalExceptionHandler {
         return R.error(validException.getCode(), validException.getDesc()).put("data", map);
     }
 
+    /**
+     * 业务异常处理器
+     */
     @ExceptionHandler(BIZException.class)
     public R handleBIZException(BIZException e) {
         log.error(e.getMessage(), e);
@@ -46,6 +52,9 @@ public class GlobalExceptionHandler {
         return R.error(bizHttpStatus.getCode(), bizHttpStatus.getDesc());
     }
 
+    /**
+     * 其他异常处理器
+     */
     @ExceptionHandler(value = Exception.class)
     public R handleException(Exception e) {
         log.error(e.getMessage(), e);

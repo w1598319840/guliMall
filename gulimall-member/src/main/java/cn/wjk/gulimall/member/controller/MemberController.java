@@ -1,21 +1,17 @@
 package cn.wjk.gulimall.member.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-//import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import cn.wjk.gulimall.member.entity.MemberEntity;
-import cn.wjk.gulimall.member.service.MemberService;
+import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
+import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
+import cn.wjk.gulimall.member.entity.MemberEntity;
+import cn.wjk.gulimall.member.service.MemberService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Map;
 
 
 /**
@@ -27,16 +23,16 @@ import cn.wjk.gulimall.common.utils.R;
  */
 @RestController
 @RequestMapping("member/member")
+@RequiredArgsConstructor
 public class MemberController {
-    @Autowired
-    private MemberService memberService;
+    private final MemberService memberService;
 
     /**
      * 列表
      */
     @RequestMapping("/list")
     //@RequiresPermissions("member:member:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = memberService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -48,8 +44,8 @@ public class MemberController {
      */
     @RequestMapping("/info/{id}")
     //@RequiresPermissions("member:member:info")
-    public R info(@PathVariable("id") Long id){
-		MemberEntity member = memberService.getById(id);
+    public R info(@PathVariable("id") Long id) {
+        MemberEntity member = memberService.getById(id);
 
         return R.ok().put("member", member);
     }
@@ -59,8 +55,8 @@ public class MemberController {
      */
     @RequestMapping("/save")
     //@RequiresPermissions("member:member:save")
-    public R save(@RequestBody MemberEntity member){
-		memberService.save(member);
+    public R save(@RequestBody MemberEntity member) {
+        memberService.save(member);
 
         return R.ok();
     }
@@ -70,8 +66,8 @@ public class MemberController {
      */
     @RequestMapping("/update")
     //@RequiresPermissions("member:member:update")
-    public R update(@RequestBody MemberEntity member){
-		memberService.updateById(member);
+    public R update(@RequestBody MemberEntity member) {
+        memberService.updateById(member);
 
         return R.ok();
     }
@@ -81,10 +77,23 @@ public class MemberController {
      */
     @RequestMapping("/delete")
     //@RequiresPermissions("member:member:delete")
-    public R delete(@RequestBody Long[] ids){
-		memberService.removeByIds(Arrays.asList(ids));
+    public R delete(@RequestBody Long[] ids) {
+        memberService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }
 
+    /**
+     * 注册
+     */
+    @PostMapping("/register")
+    public R register(@RequestBody UserRegisterTO userRegisterTO) {
+        try {
+            memberService.register(userRegisterTO);
+        } catch (RegisterException e) {
+            BizHttpStatusEnum bizHttpStatusEnum = e.getBizHttpStatusEnum();
+            return R.error(bizHttpStatusEnum.getCode(), bizHttpStatusEnum.getDesc());
+        }
+        return R.ok();
+    }
 }

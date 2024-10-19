@@ -1,6 +1,10 @@
 package cn.wjk.gulimall.common.feign;
 
+import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
+import cn.wjk.gulimall.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * @Package: cn.wjk.gulimall.common.feign
@@ -12,4 +16,6 @@ import org.springframework.cloud.openfeign.FeignClient;
  */
 @FeignClient("gulimall-member")
 public interface MemberFeign {
+    @PostMapping("/member/member/register")
+    R register(@RequestBody UserRegisterTO userRegisterTO);
 }
