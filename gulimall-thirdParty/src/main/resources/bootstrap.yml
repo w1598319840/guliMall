@@ -2,6 +2,8 @@
 spring:
   application:
     name: gulimall-thirdParty
+  profiles:
+    active: dev
   cloud:
     nacos:
       discovery:
@@ -12,3 +14,4 @@ spring:
         file-extension: yaml
         shared-configs:
           - data-id: gulimall-shared-alioss.yaml
+          - data-id: gulimall-shared-sms.yaml

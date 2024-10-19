@@ -1,6 +1,7 @@
-package cn.wjk.gulimall.product.exceptionHandler;
+package cn.wjk.gulimall.common.exceptionHandler;
 
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+import cn.wjk.gulimall.common.exception.BIZException;
 import cn.wjk.gulimall.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -13,11 +14,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @Package: cn.wjk.gulimall.product.exceptionHandler
+ * @Package: cn.wjk.gulimall.common.exceptionHandler
  * @ClassName: GlobalExceptionHandler
  * @Version: 1.0
  * @Author: 温嘉凯
- * @Datetime: 2024/10/6 下午2:00
+ * @Datetime: 2024/10/19 下午2:53
  * @Description: 全局异常处理器
  */
 @RestControllerAdvice
@@ -36,6 +37,13 @@ public class GlobalExceptionHandler {
                 }, (firstKey, secondKey) -> firstKey + "并且" + secondKey));
         BizHttpStatusEnum validException = BizHttpStatusEnum.VALID_EXCEPTION;
         return R.error(validException.getCode(), validException.getDesc()).put("data", map);
+    }
+
+    @ExceptionHandler(BIZException.class)
+    public R handleBIZException(BIZException e) {
+        log.error(e.getMessage(), e);
+        BizHttpStatusEnum bizHttpStatus = e.getBizHttpStatusEnum();
+        return R.error(bizHttpStatus.getCode(), bizHttpStatus.getDesc());
     }
 
     @ExceptionHandler(value = Exception.class)

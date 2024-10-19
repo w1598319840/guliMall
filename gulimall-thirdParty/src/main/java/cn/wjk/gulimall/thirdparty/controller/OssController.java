@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @Datetime: 2024/10/5 下午7:38
  * @Description: Oss对象存储Controller
  */
-@RestController()
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/oss")
 public class OssController {
     private final OssService ossService;
 
-    @RequestMapping("/oss/policy")
+    @RequestMapping("/policy")
     public R policy() {
         return R.ok().put("data", ossService.putOss());
     }

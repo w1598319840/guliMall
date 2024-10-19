@@ -18,6 +18,7 @@ import lombok.Getter;
  *               13: 订单模块
  *               14: 商品模块
  *               15: 仓储模块
+ *               16: 权限认证模块
  */
 @AllArgsConstructor
 @Getter
@@ -29,7 +30,8 @@ public enum BizHttpStatusEnum {
     RPC_DATA_EXCEPTION(10004, "远程获取数据与预期数据类型不符"),
     PRODUCT_UP_EXCEPTION(14001, "商品上架失败"),
     MERGE_EXCEPTION(15001, "仅能合并新建、已分配状态的采购需求"),
-    PURCHASE_STATUS_EXCEPTION(15002, "采购单状态异常");
+    PURCHASE_STATUS_EXCEPTION(15002, "采购单状态异常"),
+    SMS_CODE_EXCEPTION(16001,"获取验证码速度过快");
 
     private final int code;
     private final String desc;

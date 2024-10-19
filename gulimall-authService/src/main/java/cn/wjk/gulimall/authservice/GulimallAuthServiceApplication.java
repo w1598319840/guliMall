@@ -6,7 +6,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients("cn.wjk.gulimall.common.feign")
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.wjk.gulimall")
 @EnableDiscoveryClient
 public class GulimallAuthServiceApplication {
     public static void main(String[] args) {
