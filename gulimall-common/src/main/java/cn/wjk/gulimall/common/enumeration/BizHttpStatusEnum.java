@@ -34,7 +34,8 @@ public enum BizHttpStatusEnum {
     SMS_CODE_EXCEPTION(16001, "获取验证码速度过快"),
     ERROR_CODE_EXCEPTION(16002, "错误的验证码"),
     PHONE_ALREADY_USED_EXCEPTION(16003, "当前手机号已被注册"),
-    USERNAME_ALREADY_EXIST_EXCEPTION(16004, "当前用户名已被占用");
+    USERNAME_ALREADY_EXIST_EXCEPTION(16004, "当前用户名已被占用"),
+    LOGIN_EXCEPTION(16005, "登录账号与密码不匹配");
 
     private final int code;
     private final String desc;

@@ -2,6 +2,7 @@ package cn.wjk.gulimall.authservice.web;
 
 import cn.wjk.gulimall.authservice.domain.dto.UserRegisterDTO;
 import cn.wjk.gulimall.authservice.service.AuthService;
+import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.utils.R;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -42,5 +43,13 @@ public class AuthController {
         authService.register(userRegisterDTO);
 
         return "login";
+    }
+
+    @PostMapping("/login")
+    public String login(@Validated UserLoginDTO userLoginDTO, Model model) {
+        authService.login(userLoginDTO);
+        //一样的，有错误直接抛异常
+        model.addAttribute("errors", Collections.emptyMap());
+        return "redirect:http://gulimall.com";
     }
 }

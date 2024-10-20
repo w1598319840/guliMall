@@ -1,7 +1,9 @@
 package cn.wjk.gulimall.member.controller;
 
+import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
@@ -91,6 +93,20 @@ public class MemberController {
         try {
             memberService.register(userRegisterTO);
         } catch (RegisterException e) {
+            BizHttpStatusEnum bizHttpStatusEnum = e.getBizHttpStatusEnum();
+            return R.error(bizHttpStatusEnum.getCode(), bizHttpStatusEnum.getDesc());
+        }
+        return R.ok();
+    }
+
+    /**
+     * 登录
+     */
+    @PostMapping("/login")
+    public R login(@RequestBody UserLoginDTO userLoginDTO) {
+        try {
+            memberService.login(userLoginDTO);
+        } catch (LoginException e) {
             BizHttpStatusEnum bizHttpStatusEnum = e.getBizHttpStatusEnum();
             return R.error(bizHttpStatusEnum.getCode(), bizHttpStatusEnum.getDesc());
         }

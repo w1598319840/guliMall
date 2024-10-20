@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.authservice.service;
 
+import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.authservice.domain.dto.UserRegisterDTO;
 
 /**
@@ -21,4 +22,9 @@ public interface AuthService {
      * 用户注册
      */
     void register(UserRegisterDTO userRegisterDTO);
+
+    /**
+     * 用户登录
+     */
+    void login(UserLoginDTO userLoginDTO);
 }

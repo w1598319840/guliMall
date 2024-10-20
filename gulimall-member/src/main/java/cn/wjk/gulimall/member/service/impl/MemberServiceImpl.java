@@ -1,7 +1,9 @@
 package cn.wjk.gulimall.member.service.impl;
 
+import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
@@ -37,7 +39,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
     }
 
     @Override
-    public void register(UserRegisterTO userRegisterTO) throws RegisterException{
+    public void register(UserRegisterTO userRegisterTO) throws RegisterException {
         //判断当前手机号是否注册过了
         Long count = this.lambdaQuery().eq(MemberEntity::getMobile, userRegisterTO.getPhone()).count();
         if (count > 0) {
@@ -59,5 +61,19 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         memberEntity.setPassword(bCryptPasswordEncoder.encode(userRegisterTO.getPassword()));
         this.save(memberEntity);
+    }
+
+    @Override
+    public void login(UserLoginDTO userLoginDTO) throws LoginException {
+        String loginacct = userLoginDTO.getLoginacct();
+        MemberEntity memberEntity = this.lambdaQuery().eq(MemberEntity::getMobile, loginacct)
+                .or().eq(MemberEntity::getUsername, loginacct).one();
+        if (memberEntity == null) {
+            throw new LoginException(BizHttpStatusEnum.LOGIN_EXCEPTION);
+        }
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        if (!bCryptPasswordEncoder.matches(userLoginDTO.getPassword(), memberEntity.getPassword())) {
+            throw new LoginException(BizHttpStatusEnum.LOGIN_EXCEPTION);
+        }
     }
 }

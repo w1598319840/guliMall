@@ -1,6 +1,8 @@
 package cn.wjk.gulimall.member.service;
 
+import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
+import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.member.entity.MemberEntity;
@@ -23,5 +25,10 @@ public interface MemberService extends IService<MemberEntity> {
      * 注册
      */
     void register(UserRegisterTO userRegisterTO) throws RegisterException;
+
+    /**
+     * 登录
+     */
+    void login(UserLoginDTO userLoginDTO) throws LoginException;
 }
 

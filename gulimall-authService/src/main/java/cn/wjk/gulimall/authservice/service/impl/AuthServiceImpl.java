@@ -3,8 +3,10 @@ package cn.wjk.gulimall.authservice.service.impl;
 import cn.wjk.gulimall.authservice.domain.dto.UserRegisterDTO;
 import cn.wjk.gulimall.authservice.service.AuthService;
 import cn.wjk.gulimall.common.constant.RedisConstants;
+import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
+import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.ObtainVerificationCodeException;
 import cn.wjk.gulimall.common.exception.RPCException;
 import cn.wjk.gulimall.common.exception.RegisterException;
@@ -81,6 +83,17 @@ public class AuthServiceImpl implements AuthService {
             throw new RegisterException(BizHttpStatusEnum.PHONE_ALREADY_USED_EXCEPTION);
         } else if (code == BizHttpStatusEnum.USERNAME_ALREADY_EXIST_EXCEPTION.getCode()) {
             throw new RegisterException(BizHttpStatusEnum.USERNAME_ALREADY_EXIST_EXCEPTION);
+        } else if (code != 0) {
+            throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
+        }
+    }
+
+    @Override
+    public void login(UserLoginDTO userLoginDTO) {
+        R result = memberFeign.login(userLoginDTO);
+        int code = result.getCode();
+        if (code == BizHttpStatusEnum.LOGIN_EXCEPTION.getCode()) {
+            throw new LoginException(BizHttpStatusEnum.LOGIN_EXCEPTION);
         } else if (code != 0) {
             throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
         }
