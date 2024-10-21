@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.thirdparty.utils;
 
+import cn.wjk.gulimall.common.utils.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Value;

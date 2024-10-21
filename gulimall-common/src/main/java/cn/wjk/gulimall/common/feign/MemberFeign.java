@@ -1,5 +1,6 @@
 package cn.wjk.gulimall.common.feign;
 
+import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
 import cn.wjk.gulimall.common.utils.R;
@@ -22,4 +23,7 @@ public interface MemberFeign {
 
     @PostMapping("/member/member/login")
     R login(@RequestBody UserLoginDTO userLoginDTO);
+
+    @PostMapping("/member/member/oauth/github/login")
+    R login(@RequestBody GithubOAuthDTO githubOAuthDTO);
 }

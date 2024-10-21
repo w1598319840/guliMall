@@ -3,8 +3,10 @@ package cn.wjk.gulimall.authservice.web;
 import cn.wjk.gulimall.authservice.domain.dto.UserRegisterDTO;
 import cn.wjk.gulimall.authservice.service.AuthService;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
+import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import cn.wjk.gulimall.common.utils.R;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -25,6 +27,7 @@ import java.util.Collections;
  */
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthService authService;
 
@@ -50,6 +53,13 @@ public class AuthController {
         authService.login(userLoginDTO);
         //一样的，有错误直接抛异常
         model.addAttribute("errors", Collections.emptyMap());
+        return "redirect:http://gulimall.com";
+    }
+
+    @GetMapping("/oauth2.0/github/success")
+    public String githubOAuth(@RequestParam("code") String code) {
+        MemberEntity memberEntity = authService.githubOAuth(code);
+        log.info("登录成功，用户:{}", memberEntity);
         return "redirect:http://gulimall.com";
     }
 }

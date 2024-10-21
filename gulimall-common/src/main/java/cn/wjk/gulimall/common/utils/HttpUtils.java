@@ -1,4 +1,4 @@
-package cn.wjk.gulimall.thirdparty.utils;
+package cn.wjk.gulimall.common.utils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;

@@ -3,7 +3,9 @@ package cn.wjk.gulimall.authservice.service.impl;
 import cn.wjk.gulimall.authservice.domain.dto.UserRegisterDTO;
 import cn.wjk.gulimall.authservice.service.AuthService;
 import cn.wjk.gulimall.common.constant.RedisConstants;
+import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
+import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
 import cn.wjk.gulimall.common.exception.LoginException;
@@ -13,7 +15,9 @@ import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.feign.MemberFeign;
 import cn.wjk.gulimall.common.feign.ThirdPartyFeign;
 import cn.wjk.gulimall.common.utils.R;
+import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -32,6 +36,7 @@ import java.util.Random;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final ThirdPartyFeign thirdPartyFeign;
     private final StringRedisTemplate stringRedisTemplate;
@@ -97,5 +102,21 @@ public class AuthServiceImpl implements AuthService {
         } else if (code != 0) {
             throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
         }
+    }
+
+    @Override
+    public MemberEntity githubOAuth(String code) {
+        R result = thirdPartyFeign.getGithubOAuthAccessKey(code);
+        if (result.getCode() != 0) {
+            throw new LoginException(BizHttpStatusEnum.RPC_EXCEPTION);
+        }
+        GithubOAuthDTO githubOAuthDTO = JSON.parseObject((String) result.get("data"), GithubOAuthDTO.class);
+        //使用access_token
+        //1. 使用当前社交帐号登录
+        result = memberFeign.login(githubOAuthDTO);
+        if (result.getCode() != 0) {
+            throw new LoginException(BizHttpStatusEnum.RPC_EXCEPTION);
+        }
+        return JSON.parseObject(((String) result.get("data")), MemberEntity.class);
     }
 }

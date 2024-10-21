@@ -13,5 +13,6 @@ spring:
         namespace: 2c3d3b29-c176-4957-ba09-3d81f6afa63d
         file-extension: yaml
         shared-configs:
-          - data-id: gulimall-shared-alioss.yaml
-          - data-id: gulimall-shared-sms.yaml
+          - data-id: gulimall-thirdParty-alioss.yaml
+          - data-id: gulimall-thirdParty-sms.yaml
+          - data-id: gulimall-thirdParty-github-oauth.yaml

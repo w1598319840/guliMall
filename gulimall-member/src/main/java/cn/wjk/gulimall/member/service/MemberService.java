@@ -1,11 +1,12 @@
 package cn.wjk.gulimall.member.service;
 
+import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
 import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.utils.PageUtils;
-import cn.wjk.gulimall.member.entity.MemberEntity;
+import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -30,5 +31,10 @@ public interface MemberService extends IService<MemberEntity> {
      * 登录
      */
     void login(UserLoginDTO userLoginDTO) throws LoginException;
+
+    /**
+     * GitHub oauth 登录
+     */
+    MemberEntity login(GithubOAuthDTO githubOAuthDTO);
 }
 

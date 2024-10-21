@@ -1,7 +1,8 @@
 package cn.wjk.gulimall.authservice.service;
 
-import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.authservice.domain.dto.UserRegisterDTO;
+import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
+import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 
 /**
  * @Package: cn.wjk.gulimall.authservice.service
@@ -27,4 +28,9 @@ public interface AuthService {
      * 用户登录
      */
     void login(UserLoginDTO userLoginDTO);
+
+    /**
+     * github社交登录
+     */
+    MemberEntity githubOAuth(String code);
 }

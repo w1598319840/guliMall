@@ -1,6 +1,6 @@
 package cn.wjk.gulimall.member.dao;
 
-import cn.wjk.gulimall.member.entity.MemberEntity;
+import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

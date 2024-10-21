@@ -1,14 +1,16 @@
 package cn.wjk.gulimall.member.controller;
 
+import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
+import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
 import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
-import cn.wjk.gulimall.member.entity.MemberEntity;
 import cn.wjk.gulimall.member.service.MemberService;
+import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +26,7 @@ import java.util.Map;
  * @date 2024-10-04 13:45:16
  */
 @RestController
-@RequestMapping("member/member")
+@RequestMapping("/member/member")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
@@ -111,5 +113,11 @@ public class MemberController {
             return R.error(bizHttpStatusEnum.getCode(), bizHttpStatusEnum.getDesc());
         }
         return R.ok();
+    }
+
+    @PostMapping("/oauth/github/login")
+    public R login(@RequestBody GithubOAuthDTO githubOAuthDTO) {
+        MemberEntity memberEntity = memberService.login(githubOAuthDTO);
+        return R.ok().put("data", JSON.toJSONString(memberEntity));
     }
 }
