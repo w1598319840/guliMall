@@ -6,6 +6,7 @@
 
 - Spring Boot
 - Spring Cloud
+- Spring Session
 - Nacos
 - ElasticSearch
 - Kibana

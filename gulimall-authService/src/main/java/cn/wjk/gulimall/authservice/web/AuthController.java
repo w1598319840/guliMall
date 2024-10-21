@@ -5,6 +5,7 @@ import cn.wjk.gulimall.authservice.service.AuthService;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import cn.wjk.gulimall.common.utils.R;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -57,9 +58,9 @@ public class AuthController {
     }
 
     @GetMapping("/oauth2.0/github/success")
-    public String githubOAuth(@RequestParam("code") String code) {
+    public String githubOAuth(@RequestParam("code") String code, HttpSession session) {
         MemberEntity memberEntity = authService.githubOAuth(code);
-        log.info("登录成功，用户:{}", memberEntity);
+        session.setAttribute("loginUser", memberEntity);
         return "redirect:http://gulimall.com";
     }
 }

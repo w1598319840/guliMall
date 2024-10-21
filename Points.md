@@ -39,3 +39,9 @@
 
 1. **子域共享**: 扩大session的作用域，那么当我们访问的路径在session作用域及其子域下时，session都有效
 
+## 使用`Spring Session`
+
+1. 引入`spring-session-data-redis`依赖
+2. 在启动类上添加`@EnableRedisHttpSession`注解
+3. 此后，所有向`HttpSession`中添加session的操作都会被filter转为向redis中添加session
+
