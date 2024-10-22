@@ -3,6 +3,7 @@ package cn.wjk.gulimall.member.service;
 import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
+import cn.wjk.gulimall.common.domain.vo.MemberVO;
 import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.utils.PageUtils;
@@ -30,11 +31,11 @@ public interface MemberService extends IService<MemberEntity> {
     /**
      * 登录
      */
-    void login(UserLoginDTO userLoginDTO) throws LoginException;
+    MemberVO login(UserLoginDTO userLoginDTO) throws LoginException;
 
     /**
      * GitHub oauth 登录
      */
-    MemberEntity login(GithubOAuthDTO githubOAuthDTO);
+    MemberVO login(GithubOAuthDTO githubOAuthDTO);
 }
 

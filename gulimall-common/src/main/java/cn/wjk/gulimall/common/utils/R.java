@@ -6,6 +6,8 @@
 
 package cn.wjk.gulimall.common.utils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import org.apache.http.HttpStatus;
 
 import java.io.Serial;
@@ -55,6 +57,28 @@ public class R extends HashMap<String, Object> {
 
     public static R ok() {
         return new R();
+    }
+
+    /**
+     * 将对象转为json字符串，用于远程调用时进行网络传输
+     */
+    public R putJson(String key, Object value) {
+        super.put(key, JSON.toJSONString(value));
+        return this;
+    }
+
+    public <T> T getAndParse(String key, Class<T> type) {
+        if (!(get(key) instanceof String)) {
+            return null;
+        }
+        return JSON.parseObject((String) get(key), type);
+    }
+
+    public<T> T getAndParse(String key, TypeReference<T> type) {
+        if (!(get(key) instanceof String)) {
+            return null;
+        }
+        return JSON.parseObject((String) get(key), type);
     }
 
     public R put(String key, Object value) {

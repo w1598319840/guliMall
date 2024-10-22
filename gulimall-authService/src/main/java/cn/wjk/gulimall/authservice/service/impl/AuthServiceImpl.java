@@ -5,8 +5,8 @@ import cn.wjk.gulimall.authservice.service.AuthService;
 import cn.wjk.gulimall.common.constant.RedisConstants;
 import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
-import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
+import cn.wjk.gulimall.common.domain.vo.MemberVO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
 import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.ObtainVerificationCodeException;
@@ -94,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void login(UserLoginDTO userLoginDTO) {
+    public MemberVO login(UserLoginDTO userLoginDTO) {
         R result = memberFeign.login(userLoginDTO);
         int code = result.getCode();
         if (code == BizHttpStatusEnum.LOGIN_EXCEPTION.getCode()) {
@@ -102,10 +102,11 @@ public class AuthServiceImpl implements AuthService {
         } else if (code != 0) {
             throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
         }
+        return result.getAndParse("data", MemberVO.class);
     }
 
     @Override
-    public MemberEntity githubOAuth(String code) {
+    public MemberVO githubOAuth(String code) {
         R result = thirdPartyFeign.getGithubOAuthAccessKey(code);
         if (result.getCode() != 0) {
             throw new LoginException(BizHttpStatusEnum.RPC_EXCEPTION);
@@ -117,6 +118,6 @@ public class AuthServiceImpl implements AuthService {
         if (result.getCode() != 0) {
             throw new LoginException(BizHttpStatusEnum.RPC_EXCEPTION);
         }
-        return JSON.parseObject(((String) result.get("data")), MemberEntity.class);
+        return result.getAndParse("data", MemberVO.class);
     }
 }

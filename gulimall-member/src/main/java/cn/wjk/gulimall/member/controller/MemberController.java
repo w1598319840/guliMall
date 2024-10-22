@@ -4,13 +4,13 @@ import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
+import cn.wjk.gulimall.common.domain.vo.MemberVO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
 import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.RegisterException;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.member.service.MemberService;
-import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,18 +106,19 @@ public class MemberController {
      */
     @PostMapping("/login")
     public R login(@RequestBody UserLoginDTO userLoginDTO) {
+        MemberVO memberVO;
         try {
-            memberService.login(userLoginDTO);
+            memberVO = memberService.login(userLoginDTO);
         } catch (LoginException e) {
             BizHttpStatusEnum bizHttpStatusEnum = e.getBizHttpStatusEnum();
             return R.error(bizHttpStatusEnum.getCode(), bizHttpStatusEnum.getDesc());
         }
-        return R.ok();
+        return R.ok().putJson("data", memberVO);
     }
 
     @PostMapping("/oauth/github/login")
     public R login(@RequestBody GithubOAuthDTO githubOAuthDTO) {
-        MemberEntity memberEntity = memberService.login(githubOAuthDTO);
-        return R.ok().put("data", JSON.toJSONString(memberEntity));
+        MemberVO memberVO = memberService.login(githubOAuthDTO);
+        return R.ok().putJson("data", memberVO);
     }
 }

@@ -165,7 +165,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         if (result.getCode() != 0) {
             throw new RPCException(BizHttpStatusEnum.RPC_EXCEPTION);
         }
-        List<AttrTO> attrTOs = JSON.parseObject(((String) result.get("data")), new TypeReference<>() {
+        List<AttrTO> attrTOs = result.getAndParse("data", new TypeReference<>() {
         });
         Map<Long, String> attrIdToAttrNameMap = attrTOs.stream()
                 .collect(Collectors.toMap(AttrTO::getAttrId, AttrTO::getAttrName));

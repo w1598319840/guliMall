@@ -3,7 +3,9 @@ package cn.wjk.gulimall.member.service.impl;
 import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.GithubUserDTO;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
+import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import cn.wjk.gulimall.common.domain.to.UserRegisterTO;
+import cn.wjk.gulimall.common.domain.vo.MemberVO;
 import cn.wjk.gulimall.common.enumeration.BizHttpStatusEnum;
 import cn.wjk.gulimall.common.exception.LoginException;
 import cn.wjk.gulimall.common.exception.RegisterException;
@@ -13,14 +15,13 @@ import cn.wjk.gulimall.common.utils.Query;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.member.dao.MemberDao;
 import cn.wjk.gulimall.member.dao.MemberLevelDao;
-import cn.wjk.gulimall.common.domain.entity.MemberEntity;
 import cn.wjk.gulimall.member.entity.MemberLevelEntity;
 import cn.wjk.gulimall.member.service.MemberService;
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -73,7 +74,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
     }
 
     @Override
-    public void login(UserLoginDTO userLoginDTO) throws LoginException {
+    public MemberVO login(UserLoginDTO userLoginDTO) throws LoginException {
         String loginacct = userLoginDTO.getLoginacct();
         MemberEntity memberEntity = this.lambdaQuery().eq(MemberEntity::getMobile, loginacct)
                 .or().eq(MemberEntity::getUsername, loginacct).one();
@@ -84,23 +85,28 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         if (!bCryptPasswordEncoder.matches(userLoginDTO.getPassword(), memberEntity.getPassword())) {
             throw new LoginException(BizHttpStatusEnum.LOGIN_EXCEPTION);
         }
+        MemberVO memberVO = new MemberVO();
+        BeanUtils.copyProperties(memberEntity, memberVO);
+        return memberVO;
     }
 
     @Override
-    public MemberEntity login(GithubOAuthDTO githubOAuthDTO) {
+    public MemberVO login(GithubOAuthDTO githubOAuthDTO) {
         //1. 根据access_key获取用户信息
         R result = thirdPartyFeign.getGithubUserInfo(githubOAuthDTO.getAccess_token());
         if (result.getCode() != 0) {
             throw new LoginException(BizHttpStatusEnum.RPC_EXCEPTION);
         }
-        GithubUserDTO githubUserDTO = JSON.parseObject(((String) result.get("data")), GithubUserDTO.class);
+        GithubUserDTO githubUserDTO = result.getAndParse("data", GithubUserDTO.class);
 
         //2. 判断是否注册过
         MemberEntity memberEntity = this.lambdaQuery().eq(MemberEntity::getGithubUid, githubUserDTO.getId()).one();
         if (memberEntity == null) {
             memberEntity = socialRegister(githubUserDTO);
         }
-        return memberEntity;
+        MemberVO memberVO = new MemberVO();
+        BeanUtils.copyProperties(memberEntity, memberVO);
+        return memberVO;
     }
 
     /**

@@ -4,7 +4,6 @@ import cn.wjk.gulimall.common.domain.dto.GithubOAuthDTO;
 import cn.wjk.gulimall.common.domain.dto.GithubUserDTO;
 import cn.wjk.gulimall.common.utils.R;
 import cn.wjk.gulimall.thirdparty.service.OAuthService;
-import com.alibaba.fastjson2.JSON;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,12 +27,12 @@ public class OAuthController {
     @GetMapping("/github/get-access-key/{code}")
     public R getGithubOAuthAccessKey(@PathVariable("code") String code) throws Exception {
         GithubOAuthDTO githubOAuthDTO = oAuthService.getGithubOAuthAccessKey(code);
-        return R.ok().put("data", JSON.toJSONString(githubOAuthDTO));
+        return R.ok().putJson("data", githubOAuthDTO);
     }
 
     @GetMapping("github/get-user-info/{accessToken}")
     public R getGithubUserInfo(@PathVariable("accessToken") String accessToken) throws Exception {
         GithubUserDTO githubUserInfo = oAuthService.getGithubUserInfo(accessToken);
-        return R.ok().put("data", JSON.toJSONString(githubUserInfo));
+        return R.ok().putJson("data", githubUserInfo);
     }
 }
