@@ -63,6 +63,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setMobile(userRegisterTO.getPhone());
         memberEntity.setUsername(userRegisterTO.getUsername());
+        memberEntity.setNickname(userRegisterTO.getUsername());
         memberEntity.setLevelId(memberLevelDao.selectOne(new QueryWrapper<MemberLevelEntity>()
                 .eq("default_status", 1)).getId());
         memberEntity.setCreateTime(new Date());

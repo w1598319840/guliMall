@@ -1,51 +1,39 @@
 package cn.wjk.gulimall.authservice.web;
 
-import cn.wjk.gulimall.authservice.domain.dto.UserRegisterDTO;
 import cn.wjk.gulimall.authservice.service.AuthService;
+import cn.wjk.gulimall.common.constant.AuthConstants;
 import cn.wjk.gulimall.common.domain.dto.UserLoginDTO;
 import cn.wjk.gulimall.common.domain.vo.MemberVO;
-import cn.wjk.gulimall.common.utils.R;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Collections;
 
 /**
  * @Package: cn.wjk.gulimall.authservice.web
- * @ClassName: AuthController
+ * @ClassName: LoginController
  * @Version: 1.0
  * @Author: 温嘉凯
- * @Datetime: 2024/10/18 下午4:44
- * @Description: 用户权限认证的controller
+ * @Datetime: 2024/10/22 下午2:34
+ * @Description:
  */
 @Controller
 @RequiredArgsConstructor
-@Slf4j
-public class AuthController {
+public class LoginController {
     private final AuthService authService;
 
-    @GetMapping("/sms/sendCode")
-    @ResponseBody
-    public R sendCode(@RequestParam("phone") String phone) {
-        authService.sendCode(phone);
-        return R.ok();
-    }
-
-    @PostMapping("/register")
-    public String register(@Validated UserRegisterDTO userRegisterDTO, Model model) {
-        //前后端不分离真是傻逼，不然直接抛出异常让GlobalExceptionHandler处理就可以了
-        //因此我打算还是让GlobalExceptionHandler处理异常，虽然这里不再是返回Json了，管他呢
-        model.addAttribute("errors", Collections.emptyMap());
-        authService.register(userRegisterDTO);
-
+    @GetMapping("/login.html")
+    public String loginPage(HttpSession session) {
+        if (session.getAttribute(AuthConstants.LOGIN_USER) != null) {
+            //登录过了
+            return "redirect:http://gulimall.com";
+        }
         return "login";
     }
 
@@ -54,14 +42,14 @@ public class AuthController {
         MemberVO memberVO = authService.login(userLoginDTO);
         //一样的，有错误直接抛异常
         model.addAttribute("errors", Collections.emptyMap());
-        session.setAttribute("loginUser", memberVO);
+        session.setAttribute(AuthConstants.LOGIN_USER, memberVO);
         return "redirect:http://gulimall.com";
     }
 
     @GetMapping("/oauth2.0/github/success")
     public String githubOAuth(@RequestParam("code") String code, HttpSession session) {
         MemberVO memberVO = authService.githubOAuth(code);
-        session.setAttribute("loginUser", memberVO);
+        session.setAttribute(AuthConstants.LOGIN_USER, memberVO);
         return "redirect:http://gulimall.com";
     }
 }
