@@ -44,7 +44,7 @@ public class CartServiceImpl implements CartService {
     private final ThreadPoolExecutor executor;
 
     @Override
-    public CartItemVO addCartItem(Long skuId, Integer num) {
+    public void addCartItem(Long skuId, Integer num) {
         //检查购物车中是否已经存在当前商品了
         HashOperations<String, Object, Object> hashOps = stringRedisTemplate.opsForHash();
         UserInfoDTO userInfoDTO = ThreadLocalUtils.get();
@@ -94,12 +94,21 @@ public class CartServiceImpl implements CartService {
         //存入redis
         hashOps.put(key, skuId.toString(), JSON.toJSONString(cartItemVO));
         stringRedisTemplate.expire(key, Duration.ofDays(30));
-        return cartItemVO;
     }
 
     @Override
     public CartVO getCart(MemberVO memberVO) {
 
         return null;
+    }
+
+    @Override
+    public CartItemVO getCartItem(Long skuId) {
+        HashOperations<String, Object, Object> hashOps = stringRedisTemplate.opsForHash();
+        UserInfoDTO userInfoDTO = ThreadLocalUtils.get();
+        String key = userInfoDTO.getUserId() == null ?
+                RedisConstants.CART_LOGOUT_PREFIX + userInfoDTO.getUserKey() ://未登录
+                RedisConstants.CART_LOGIN_PREFIX + userInfoDTO.getUserId();//已登录
+        return JSON.parseObject((String) hashOps.get(key, skuId.toString()), CartItemVO.class);
     }
 }
