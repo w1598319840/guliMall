@@ -1,9 +1,10 @@
 package cn.wjk.gulimall.product.service;
 
 import cn.wjk.gulimall.common.utils.PageUtils;
-import com.baomidou.mybatisplus.extension.service.IService;
 import cn.wjk.gulimall.product.domain.entity.SkuSaleAttrValueEntity;
+import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,10 @@ import java.util.Map;
 public interface SkuSaleAttrValueService extends IService<SkuSaleAttrValueEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 根据skuId获取该sku的属性，以List的方式返回，每个属性以及其值拼接成一个String
+     */
+    List<String> listWithString(Long skuId);
 }
 

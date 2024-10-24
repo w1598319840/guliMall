@@ -1,7 +1,9 @@
 package cn.wjk.gulimall.cart.domain.vo;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
  * @Description: 一个用户的整个购物车
  */
 @SuppressWarnings("unused")
+@ToString
+@EqualsAndHashCode
 public class CartVO {
     @Setter
     @Getter

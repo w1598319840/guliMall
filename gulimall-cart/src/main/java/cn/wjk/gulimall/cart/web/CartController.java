@@ -7,8 +7,7 @@ import cn.wjk.gulimall.common.utils.ThreadLocalUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -42,9 +41,11 @@ public class CartController {
     /**
      * 添加购物车商品
      */
-    @PostMapping
-    public String addCartItem(@RequestBody CartItemVO cartItemVO) {
-        cartService.addCartItem(cartItemVO);
-        return "success";
+    @GetMapping("/addCartItem")
+    public ModelAndView addCartItem(@RequestParam("skuId") Long skuId, @RequestParam("num") Integer num) {
+        ModelAndView modelAndView = new ModelAndView("success");
+        CartItemVO cartItemVO = cartService.addCartItem(skuId, num);
+        modelAndView.addObject("cartItem", cartItemVO);
+        return modelAndView;
     }
 }

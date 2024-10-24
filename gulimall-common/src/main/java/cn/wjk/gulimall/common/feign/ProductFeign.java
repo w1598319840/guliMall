@@ -3,6 +3,7 @@ package cn.wjk.gulimall.common.feign;
 import cn.wjk.gulimall.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -22,4 +23,10 @@ public interface ProductFeign {
 
     @GetMapping("/product/attr/name")
     R getAttrNameByAttrIds(@RequestParam("attrIds") List<Long> attrIds);
+
+    @GetMapping("/product/skuinfo/sku-info/{skuId}")
+    R skuInfo(@PathVariable("skuId") Long skuId);
+
+    @GetMapping("/product/skusaleattrvalue/list/string/{skuId}")
+    R listWithString(@PathVariable("skuId") Long skuId);
 }

@@ -4,7 +4,7 @@ import cn.wjk.gulimall.common.domain.dto.PageDTO;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.Query;
 import cn.wjk.gulimall.product.dao.SkuInfoDao;
-import cn.wjk.gulimall.product.domain.entity.SkuInfoEntity;
+import cn.wjk.gulimall.common.domain.entity.SkuInfoEntity;
 import cn.wjk.gulimall.product.service.SkuInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

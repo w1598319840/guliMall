@@ -15,8 +15,10 @@ import cn.wjk.gulimall.common.domain.vo.MemberVO;
 public interface CartService {
     /**
      * 添加购物车项
+     *
+     * @return 添加的具体商品项
      */
-    void addCartItem(CartItemVO cartItemVO);
+    CartItemVO addCartItem(Long skuId, Integer num);
 
     /**
      * 获取购物车详情

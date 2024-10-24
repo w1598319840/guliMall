@@ -19,6 +19,7 @@ import lombok.Getter;
  *               14: 商品模块
  *               15: 仓储模块
  *               16: 权限认证模块
+ *               17: 购物车模块
  */
 @AllArgsConstructor
 @Getter
@@ -36,7 +37,8 @@ public enum BizHttpStatusEnum {
     PHONE_ALREADY_USED_EXCEPTION(16003, "当前手机号已被注册"),
     USERNAME_ALREADY_EXIST_EXCEPTION(16004, "当前用户名已被占用"),
     LOGIN_EXCEPTION(16005, "登录账号与密码不匹配"),
-    OAUTH_LOGIN_EXCEPTION(16006, "使用社交账号登录失败，请稍后再试");
+    OAUTH_LOGIN_EXCEPTION(16006, "使用社交账号登录失败，请稍后再试"),
+    ADD_ITEM_EXCEPTION(17001,"添加商品进入购物车失败，请稍后再试");
 
     private final int code;
     private final String desc;

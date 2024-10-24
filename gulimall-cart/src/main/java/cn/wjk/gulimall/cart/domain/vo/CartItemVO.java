@@ -1,6 +1,8 @@
 package cn.wjk.gulimall.cart.domain.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.List;
  * @Description: 购物车中每一项商品
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CartItemVO {
     private Long skuId;
     private String title;

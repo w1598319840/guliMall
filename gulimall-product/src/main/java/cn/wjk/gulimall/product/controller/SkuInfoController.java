@@ -1,9 +1,9 @@
 package cn.wjk.gulimall.product.controller;
 
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
+import cn.wjk.gulimall.common.domain.entity.SkuInfoEntity;
 import cn.wjk.gulimall.common.utils.PageUtils;
 import cn.wjk.gulimall.common.utils.R;
-import cn.wjk.gulimall.product.domain.entity.SkuInfoEntity;
 import cn.wjk.gulimall.product.service.SkuInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @date 2024-10-03 20:19:51
  */
 @RestController
-@RequestMapping("product/skuinfo")
+@RequestMapping("/product/skuinfo")
 @RequiredArgsConstructor
 public class SkuInfoController {
     private final SkuInfoService skuInfoService;
@@ -42,8 +42,16 @@ public class SkuInfoController {
     @RequestMapping("/info/{skuId}")
     public R info(@PathVariable("skuId") Long skuId) {
         SkuInfoEntity skuInfo = skuInfoService.getById(skuId);
-
         return R.ok().put("skuInfo", skuInfo);
+    }
+
+    /**
+     * 根据skuId获取skuId
+     */
+    @GetMapping("/sku-info/{skuId}")
+    public R skuInfo(@PathVariable("skuId") Long skuId) {
+        SkuInfoEntity skuInfo = skuInfoService.getById(skuId);
+        return R.ok().putJson("data", skuInfo);
     }
 
     /**

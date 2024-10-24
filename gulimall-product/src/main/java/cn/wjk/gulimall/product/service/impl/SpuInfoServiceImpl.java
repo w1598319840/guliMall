@@ -2,6 +2,7 @@ package cn.wjk.gulimall.product.service.impl;
 
 import cn.wjk.gulimall.common.constant.ProductConstant;
 import cn.wjk.gulimall.common.domain.dto.PageDTO;
+import cn.wjk.gulimall.common.domain.entity.SkuInfoEntity;
 import cn.wjk.gulimall.common.domain.to.SkuReductionTO;
 import cn.wjk.gulimall.common.domain.to.SpuBoundsTO;
 import cn.wjk.gulimall.common.domain.to.es.AttrEsModel;

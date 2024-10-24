@@ -1,7 +1,7 @@
 package cn.wjk.gulimall.product.domain.vo;
 
+import cn.wjk.gulimall.common.domain.entity.SkuInfoEntity;
 import cn.wjk.gulimall.product.domain.entity.SkuImagesEntity;
-import cn.wjk.gulimall.product.domain.entity.SkuInfoEntity;
 import cn.wjk.gulimall.product.domain.entity.SpuInfoDescEntity;
 import lombok.Data;
 
@@ -19,9 +19,11 @@ import java.util.List;
 public class SkuItemVO {
     private SkuInfoEntity info;
     private List<SkuImagesEntity> images;
-    private SpuInfoDescEntity desp;
+    private SpuInfoDescEntity desc;
     private List<ItemSaleAttrVO> saleAttr;
     private List<SpuItemAttrGroupVO> groupAttrs;
+    private Object seckillSku = null;
+    private Boolean hasStock = true;
 
     @Data
     public static class ItemSaleAttrVO {
@@ -31,7 +33,7 @@ public class SkuItemVO {
     }
 
     @Data
-    public static class AttrValueWithSkuIdVO{
+    public static class AttrValueWithSkuIdVO {
         private String attrValue;
         //每个attr下的skuId -> 12,13,14
         //类似于倒排索引

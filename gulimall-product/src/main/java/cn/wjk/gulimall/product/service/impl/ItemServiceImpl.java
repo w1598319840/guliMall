@@ -2,7 +2,7 @@ package cn.wjk.gulimall.product.service.impl;
 
 import cn.wjk.gulimall.product.dao.*;
 import cn.wjk.gulimall.product.domain.entity.SkuImagesEntity;
-import cn.wjk.gulimall.product.domain.entity.SkuInfoEntity;
+import cn.wjk.gulimall.common.domain.entity.SkuInfoEntity;
 import cn.wjk.gulimall.product.domain.entity.SkuSaleAttrValueEntity;
 import cn.wjk.gulimall.product.domain.vo.SkuItemVO;
 import cn.wjk.gulimall.product.service.ItemService;
@@ -68,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
         }
         Long spuId = skuInfoEntity.getSpuId();
         CompletableFuture<Void> despFuture = CompletableFuture.runAsync(() ->
-                skuItemVO.setDesp(spuInfoDescDao.selectById(spuId)), threadPoolExecutor);
+                skuItemVO.setDesc(spuInfoDescDao.selectById(spuId)), threadPoolExecutor);
         SkuInfoEntity finalSkuInfoEntity = skuInfoEntity;
         CompletableFuture<Void> groupAttrsFuture = CompletableFuture.runAsync(() ->
                 skuItemVO.setGroupAttrs(attrGroupDao.selectGroupAttrsWithSpuIdAndCatalogId(spuId, finalSkuInfoEntity.getCatalogId())), threadPoolExecutor);
