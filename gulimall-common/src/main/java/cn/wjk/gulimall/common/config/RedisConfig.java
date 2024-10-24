@@ -1,5 +1,6 @@
-package cn.wjk.gulimall.authservice.config;
+package cn.wjk.gulimall.common.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -8,7 +9,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
- * @Package: cn.wjk.gulimall.authservice.config
+ * @Package: cn.wjk.gulimall.common.config
  * @ClassName: RedisConfig
  * @Version: 1.0
  * @Author: 温嘉凯
@@ -18,6 +19,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 @Configuration
 public class RedisConfig {
     @Bean
+    @ConditionalOnClass(StringRedisTemplate.class)
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory factory) {
         StringRedisTemplate stringRedisTemplate = new StringRedisTemplate(factory);
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer();

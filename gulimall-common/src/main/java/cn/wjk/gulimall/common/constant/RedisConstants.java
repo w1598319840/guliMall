@@ -17,4 +17,6 @@ public interface RedisConstants {
     Duration PRODUCT_CATALOG_JSON_LOCK_EXPIRE_TIME = Duration.ofSeconds(5);
     String PRODUCT_CATEGORY_PREFIX = "product:category";
     String AUTH_LOGIN_CODE_PREFIX = "auth:login:code:";
+    String CART_LOGIN_PREFIX = "cart:login:";
+    String CART_LOGOUT_PREFIX = "cart:logout:";
 }

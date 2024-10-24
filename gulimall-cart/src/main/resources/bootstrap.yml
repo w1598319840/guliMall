@@ -14,3 +14,4 @@ spring:
         file-extension: yaml
         shared-configs:
           - data-id: gulimall-shared-jackson.yaml
+          - data-id: gulimall-shared-redis.yaml

@@ -19,6 +19,10 @@ public class MemberVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * id
+     */
+    private Long id;
+    /**
      * 账号
      */
     private String username;

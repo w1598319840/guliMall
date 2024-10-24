@@ -10,4 +10,6 @@ package cn.wjk.gulimall.common.constant;
  */
 public interface AuthConstants {
     String LOGIN_USER = "loginUser";
+    String TEMP_USER_KEY = "user-key";
+    int TEMP_USER_KEY_TTL = 60 * 60 * 24 * 30;
 }

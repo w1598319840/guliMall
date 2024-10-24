@@ -27,6 +27,11 @@ import java.util.Collections;
 public class RegisterController {
     private final AuthService authService;
 
+    @GetMapping("/reg.html")
+    public String reg() {
+        return "reg";
+    }
+
     @GetMapping("/sms/sendCode")
     @ResponseBody
     public R sendCode(@RequestParam("phone") String phone) {
